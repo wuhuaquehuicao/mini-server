@@ -1,0 +1,30 @@
+{
+    "name": "express-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "serve": "node src/main/app.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^0.18.0",
+        "body-parser": "^1.18.3",
+        "data-store": "^3.0.3",
+        "deep-equal": "^1.0.1",
+        "express": "^4.16.4",
+        "js-base64": "^2.4.9",
+        "jsonwebtoken": "^8.3.0",
+        "md5": "^2.2.1",
+        "sqlite3": "^4.0.6"
+    },
+    "setting": {
+        "jwt": {
+            "algorithm": "RS256",
+            "privateKey": "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlDWFFJQkFBS0JnUUM5bGlrMnNRcndmazBJcGdrM1Q0Z1BnV0VYY0paU0RNNVJHL0FBalhBelJyaFV4VGp5CklDZjJmV1RLNVRjVFhINkFyNXRmcEVFemhGc0tDcGUvdlN3QmVPbm04d3hSTUZjZlkrQWNCMm0ycG9aeFBKclUKSVhkbzMwKzN3MEY4UEpUS1ZxMjhLNE5wWlpPUndXMi8wZEY1QnNhZ3VnaDE2Tk1PK041SUpEU0hpUUlEQVFBQgpBb0dCQUlFTWI2MWN3YmVHSVdXYnIzWkkyckxEUEpXNSszaUtZdjN1NkdWWDRXSGw1NTg4U0ZEMzludmdTdldaCkpPNDI3WjBtNjdva2tvVkF1TCtUQ2t4bnRrVjJYYXZKSC9xcTd5OWFWQWVwWTdjWEJGcDFxMk00MWd6bk51Q24KenZXVDl6aTdpRVI5cGFML0p0MXlLVmphUGduT1djdnd0OGk1YmZtVHhzNFFmRG1oQWtFQTNhSlpobGFJdVNpUgpHWWxoL1k1OWlBL0ZSYVpKR0RzMnYySnMwVW16bDhTQkNqeUZPOG13cEltSkQvZnhqcDNkbGE4RnJjemlTekhICjBkRytEVGJBdFFKQkFOcjdzczB0ZmZCRWhZazU1VnRoLzJnK0ZKZFQ1QlkxWnh1ZnpKT21iTklOWmc1bTZHdkwKTlpacDJxUCtLVHZJUEwyaTRXQ2Rja0dDZEt3M29EdkdOQVVDUUJjekEwUDRrdDh1eStGc2JBRnFoT0ZWSlVVaApIczJXaFNpTFdQQ2ZVbGswakgxUjBIQnRzRHZJMmJ2K0xCN05qNEEzamRTZmVhQjlXWGt4QnovQzEzRUNRQzJnCldlM2tONlJUTXB1WUE1RFp4MVNaOHNKaENWb1RRR3VDRFNjS2V3djlITEdOZ1luTUtsc3ZyUTJVVEZVWGNJaDIKb296MTRUT0RFZm84RU5mRGdWMENRUUNSb254QzBTL1FUWDl2WUZHZXA0SUMxRDJySDdFcm00TDhkU24rb0l6RwpWa25ham0yTDQwSWZNZVFmNzQ4dGpPcWR5Z1ZHejI4aEwrdk1zRWIzaWp6MAotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=",
+            "publicKey": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FDOWxpazJzUXJ3ZmswSXBnazNUNGdQZ1dFWApjSlpTRE01UkcvQUFqWEF6UnJoVXhUanlJQ2YyZldUSzVUY1RYSDZBcjV0ZnBFRXpoRnNLQ3BlL3ZTd0JlT25tCjh3eFJNRmNmWStBY0IybTJwb1p4UEpyVUlYZG8zMCszdzBGOFBKVEtWcTI4SzROcFpaT1J3VzIvMGRGNUJzYWcKdWdoMTZOTU8rTjVJSkRTSGlRSURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo="
+        }
+    }
+}

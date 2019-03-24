@@ -1,0 +1,277 @@
+<html>
+<meta charset="utf-8" />
+<title>WebSocket Test</title>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    canvas {
+        border:1px solid #0ad18f;
+        background-color: #0ad18f;
+    }
+    </style>
+  <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<script language="javascript" type="text/javascript">
+  //https://www.w3schools.com/graphics/game_intro.asp
+  var postId = 0;
+  var userId = 1;
+  var roomId = 0;
+
+  function init() {
+    document.myform.disconnectButton.disabled = true;
+    document.myform.sendButton.disabled = true;
+    var canvas = document.getElementById("myCanvas");
+    canvas.addEventListener.apply(canvas, ["mousedown", mouseDown, false]);
+    canvas.addEventListener.apply(canvas, ["mousemove", mouseMove, false]);
+    selectPlayer(1);
+  }
+
+  function doConnect() {
+    if (roomId <= 0)
+      return;
+    websocket = new WebSocket("ws://localhost:7000/ws/v1/mobile?u=" + userId + "&v=ios-1.0&r=" + roomId);
+    websocket.onopen = function (evt) {
+      onOpen(evt)
+    };
+    websocket.onclose = function (evt) {
+      onClose(evt)
+    };
+    websocket.onmessage = function (evt) {
+      onMessage(evt)
+    };
+    websocket.onerror = function (evt) {
+      onError(evt)
+    };
+  }
+
+  function onOpen(evt) {
+    writeToScreen("connected\n");
+    document.myform.connectButton.disabled = true;
+    document.myform.disconnectButton.disabled = false;
+    document.myform.sendButton.disabled = false;
+    //login();
+
+  }
+
+  function onClose(evt) {
+    writeToScreen("disconnected\n");
+    document.myform.connectButton.disabled = false;
+    document.myform.disconnectButton.disabled = true;
+    document.myform.sendButton.disabled = true;
+  }
+
+  function blob2String(buf, callback) {
+    var f = new FileReader();
+    f.onload = function (e) {
+      callback(e.target.result)
+    }
+    f.readAsText(buf);
+  }
+
+  function login() {
+    postId++;
+    var player = document.myform.player.value;
+    var method = "login";
+    var pwd = "123";
+    var version = "ios-1.0";
+    var params = "\"" + player + "\",\"" + pwd + "\",\"" + version + "\"";
+    var data = "{\"id\":" + postId + ",\"method\":\"" + method + "\",\"params\":[" + params + "]}";
+    doSend(data);
+  }
+
+  function onMessage(evt) {
+    /*blob2String(evt.data,
+      function (string) {
+        var jd = JSON.parse(string);
+        if (jd != null)
+          writeToScreen("R: " + JSON.stringify(jd) + '\n');
+      }
+    )*/
+    writeToScreen("response: " + evt.data + '\n');
+    var ret = JSON.parse(evt.data);
+    if (ret.t === "rd") {
+      drawRound(ret);
+    }
+    //writeToScreen("response: " + JSON.stringify(evt.data) + '\n');
+  }
+
+  function onError(evt) {
+    writeToScreen('error: ' + evt.data + '\n');
+    websocket.close();
+    document.myform.connectButton.disabled = false;
+    document.myform.disconnectButton.disabled = true;
+    document.myform.sendButton.disabled = true;
+  }
+
+  function doSend(message) {
+    var method = document.myform.method.value;
+    var params = document.myform.params.value;
+    writeToScreen("S: " + message + '\n');
+    websocket.send(message);
+  }
+
+  function writeToScreen(message) {
+    document.myform.outputtext.value += message
+    document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
+  }
+
+  window.addEventListener("load", init, false);
+
+  function sendText() {
+    postId++;
+    var method = document.myform.method.value;
+    var params = document.myform.params.value;
+    var data = "{\"id\":" + postId + ",\"method\":\"" + method + "\",\"params\":[" + params + "]}";
+    doSend(data);
+  }
+
+  function clearText() {
+    document.myform.outputtext.value = "";
+  }
+
+  function doDisconnect() {
+    websocket.close();
+  }
+
+  function mouseDown(event) {
+    var canvas = document.getElementById("myCanvas");
+    var x = event.pageX - canvas.offsetLeft;
+    var y = event.pageY - canvas.offsetTop;
+
+    console.log("mouseDown x=" + x + ",y=" + y);
+  }
+
+  function mouseMove(event) {
+    var canvas = document.getElementById("myCanvas");
+    var x = event.pageX - canvas.offsetLeft;
+    var y = event.pageY - canvas.offsetTop;
+
+    var output = document.getElementById("output");
+    output.innerText = "mouseMove x=" + x + ",y=" + y;
+  }
+
+  function drawRound(round) {
+    var ctx = document.getElementById("myCanvas").getContext("2d");
+    var players = Object.keys(round.pi);
+    for (var i = 0; i < players.length; i++) {
+      if (typeof round.pi[players[i]] === "object") {
+        var cards = round.pi[players[i]];
+        cards.sort(function (a, b) {
+          return a.localeCompare(b);
+        });
+        for (var j = 0; j < round.pi[players[i]].length; j++) {
+          drawCard(ctx, j, cards[j]);
+        }
+      }
+    }
+  }
+
+  var config = {
+    card: {
+      x: 50,
+      y: 340,
+      w: 25,
+      h: 50,
+      inteval: 3,
+      fx: 6,
+      fy: 26
+    }
+  };
+
+  function drawCard(ctx, index, card) {
+    //ctx.fillStyle = "#332244";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(config.card.x + index * (config.card.w + config.card.inteval), config.card.y, config.card.w, config.card
+      .h);
+    ctx.fillStyle = "#ff0000";
+    ctx.font = "12px Arial";
+    ctx.fillText(card.substr(0, 2), config.card.x + config.card.fx + index * (config.card.w + config.card.inteval),
+      config.card.y + config.card.fy);
+  }
+
+  function postData(method) {
+    var len = arguments.length;
+    postId++;
+    var params = [];
+    for (var i = 1; i < arguments.length; i++) {
+      params.push(arguments[i]);
+    }
+    return {
+      id: postId,
+      method: method,
+      params: params
+    };
+  }
+
+  function selectPlayer(id) {
+    userId = id;
+    var playerIdLabel = document.getElementById("playerIdLabel");
+    playerIdLabel.innerText = id;
+  }
+
+  function joinRoom() {
+    var roomIdInput = document.getElementById("roomIdInput");
+  }
+
+  function createRoom() {
+    postId++;
+    var count = 8;
+    var method = "create";
+    var version = "ios-1.0";
+    var params = [];
+    params.push(count);
+    params.push("test");
+
+    var d = postData("create", count, "test");
+    var d2 = JSON.stringify(d);
+    //var data = "{\"id\":" + postId + ",\"method\":\"" + method + "\",\"params\":[" + params.join(",") + "]}";
+
+    $.ajax({
+      url: '/api/v1/mobile',
+      type: 'POST',
+      dataType: 'json',
+      data: d2,
+      success: function (response) {
+        roomId = response.id;
+
+        var roomIdLabel = document.getElementById("roomIdLabel");
+        roomIdLabel.innerText = roomId;
+        if (roomId > 0) {
+          doConnect();
+        }
+      },
+      error: function (status) {
+        console.log(status);
+      }
+    });
+  }
+</script>
+<canvas id="myCanvas" width="600" height="400">
+</canvas>
+<div id="output"></div>
+<form name="myform">
+  <p>
+    Room: <input type="button" value="Create" onClick="createRoom();">
+    <input type="button" value="Join" onClick="joinRoom();"> <input type="text" name="roomIdInput" id="roomIdInput" />
+    <label id="roomIdLabel"></label>
+  </p>
+  <p>
+    Player: <input type="button" value="P1" onClick="selectPlayer(1);">
+    <input type="button" value="P2" onClick="selectPlayer(2);">
+    <input type="button" value="P3" onClick="selectPlayer(3);">
+    <input type="button" value="P4" onClick="selectPlayer(4);">
+    <label id="playerIdLabel"></label>
+  </p>
+  <p>
+    <input type="button" name=sendButton value="Send" onClick="sendText();">
+    <input type="button" name=clearButton value="Clear" onClick="clearText();">
+    <input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
+    <input type="button" name=connectButton value="Connect" onClick="doConnect();">
+  </p>
+  <p>
+    <textarea name="outputtext" rows="10" cols="100"></textarea>
+  </p>
+</form>
+
+</html>

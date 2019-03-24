@@ -1,0 +1,135 @@
+<html>
+<title>
+    Test
+</title>
+<header>
+    <!-- <script src="https://cdn.bootcss.com/babel-polyfill/7.0.0/polyfill.min.js"></script> -->
+    <script src="https://cdn.bootcss.com/vue/2.5.17/vue.js"></script>
+    <script src="https://cdn.bootcss.com/vue-resource/1.5.1/vue-resource.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/en.js"></script>
+</header>
+
+<body>
+    <div id="app">
+        <el-row>
+            <el-col :span="5">&nbsp;</el-col>
+            <el-col :span="14">
+                <el-button type="primary" @click="addAccount()" size="small">Add</el-button>
+            </el-col>
+            <el-col :span="5">&nbsp;</el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="5">&nbsp;</el-col>
+            <el-col :span="14">
+                <el-table :data="accounts" border="" v-loading="loading" style="width: 100%">
+                    <el-table-column prop="email" label="Email" align="center">
+                        <template slot-scope="scope">
+                            <el-input v-model="scope.row.email" placeholder="Email"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="password" label="Password" align="center">
+                        <template slot-scope="scope">
+                            <el-input type="password" v-model="scope.row.password" placeholder="Password"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Login" align="center">
+                        <template slot-scope="scope">
+                            <el-button @click="loginAccount(scope.row)" type="primary" size="small">Login</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="link" label="Link" align="center">
+                        <template slot-scope="scope">
+                            <a v-show="scope.row.link.length>0" :href="scope.row.link" target="_blank">Go</a>
+                        </template>
+                    </el-table-column>
+                    <el-table-column fixed="right" label="Delete" align="center">
+                        <template slot-scope="scope">
+                            <el-button @click="deleteAccount(scope.$index)" type="danger" size="small">Delete</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-col>
+            <el-col :span="5">&nbsp;</el-col>
+        </el-row>
+    </div>
+    <script type="text/javascript">
+        ELEMENT.locale(ELEMENT.lang.en);
+        ELEMENT.size = "small";
+        //http://element-cn.eleme.io/#/zh-CN/component/table
+        var vm = new Vue({
+            el: '#app',
+            data: function () {
+                var self = this;
+                return {
+                    loading: false,
+                    accounts: []
+                }
+            },
+            mounted: function () {
+                // this.$nextTick(function () {
+                //     this.doLayout();
+                // });
+                //this.$nextTick(function () {
+                this.accounts = JSON.parse(localStorage.getItem("accounts"));
+                if (this.accounts == null || this.accounts.length == 0) {
+                    this.accounts = [{
+                            email: "ramon@justek.us",
+                            password: "WjJRw2YA@",
+                            link: ""
+                        },
+                        {
+                            email: "ramonli@shieldbanking.com",
+                            password: "Justek1l03!",
+                            link: ""
+                        },
+                    ]
+                }
+                //})
+            },
+            methods: {
+                addAccount: function (index) {
+                    this.accounts.push({
+                        email: "",
+                        password: "",
+                        link: ""
+                    });
+                },
+                deleteAccount: function (index) {
+                    if (confirm("Delete Account?"))
+                        this.accounts.splice(index, 1);
+                },
+                loginAccount: function (account) {
+                    var self = this;
+                    if (account.email != null && account.email.length > 0 && account.password != null &&
+                        account.password.length > 0) {
+                        localStorage.setItem("accounts", JSON.stringify(this.accounts));
+                        self.loading = true;
+                        this.$http.post('/api/v1/scs/login', {
+                            email: account.email,
+                            password: account.password
+                        }).then(function (res) {
+                            self.loading = false;
+                            if (res.status == 200) {
+                                account.link = res.body.link;
+                                localStorage.setItem("accounts", JSON.stringify(this.accounts));
+                                window.open(res.body.link, '_blank');
+                            } else {
+                                alert("error");
+                            }
+                        }, function (res) {
+                            self.loading = false;
+                            alert(res.status);
+                            console.log(res.status);
+                        });
+                    } else {
+                        alert("invalid email or password");
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
