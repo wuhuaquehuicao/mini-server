@@ -72,13 +72,13 @@ App.prototype.start = function () {
     //if (process.env.NODE_ENV !== "test")
     self.DataManager.start();
 
-    self.server.listen(7000, function () {
+    self.server.listen(80, function () {
         console.log(
             "%s [%s-%s] listening at %s",
             Package.name,
             process.env.NODE_ENV,
             Package.version,
-            7000
+            80
         );
     });
     self.DataManager.emit("start");
