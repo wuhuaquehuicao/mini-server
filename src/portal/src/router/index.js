@@ -38,19 +38,55 @@ export const constantRouterMap = [
       component: () => import('@/views/dashboard/index')
     }]
   },
+
+  // 石灰客户
+  {
+    path: '/caouser',
+    component: Layout,
+    redirect: '/caouser/list',
+    name: 'Caouser',
+    meta: { title: '石灰用户', icon: 'example' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/caouser/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'Add',
+        component: () => import('@/views/caouser/edit'),
+        meta: { title: '新增', icon: 'table' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'Edit',
+        component: () => import('@/views/caouser/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
+      }
+    ]
+  },
   // 记录
   {
     path: '/record',
     component: Layout,
-    redirect: '/record/add',
+    redirect: '/record/list',
     name: 'Record',
-    meta: { title: '记录', icon: 'example' },
+    meta: { title: '石灰记录', icon: 'example' },
     children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/record/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
       {
         path: 'add',
         name: 'Add',
         component: () => import('@/views/record/edit'),
-        meta: { title: '录入', icon: 'table' }
+        meta: { title: '新增', icon: 'table' }
       },
       {
         path: 'edit/:id',
@@ -58,12 +94,6 @@ export const constantRouterMap = [
         component: () => import('@/views/record/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
-      },
-      {
-        path: 'list',
-        name: 'List',
-        component: () => import('@/views/record/list'),
-        meta: { title: '查看', icon: 'table' }
       }
     ]
   },

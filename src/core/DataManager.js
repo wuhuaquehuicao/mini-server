@@ -231,4 +231,81 @@ DataManager.prototype.getRecordsCount = function (callback) {
     });
 };
 
+DataManager.prototype.addCaoUser = function (caoUser, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.run("INSERT INTO caoUser (name, phone,address) VALUES (?,?,?)",
+            caoUser.name, caoUser.phone, caoUser.address, function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            caoUser["id"] = this.lastID;
+                            return self.getCaoUser(this.lastID, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.updateCaoUser = function (id, caoUser, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.run("UPDATE caoUser SET name = ?, phone = ?, address = ? WHERE id = ?",
+            [caoUser.name, caoUser.phone, caoUser.address, id], function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            return self.getCaoUser(id, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.getCaoUser = function (id, callback) {
+    db.serialize(function () {
+        db.get("SELECT * FROM caoUser WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.getCaoUsers = function (query, callback) {
+    var self = this;
+    var size = 10;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    db.serialize(function () {
+        db.all("SELECT * FROM caoUser order by id desc limit ? offset ?", [size, offset], function (error, result) {
+            if (callback) {
+                self.getCaoUsersCount((err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getCaoUsersCount = function (callback) {
+    db.serialize(function () {
+        db.get("SELECT count(*) as total FROM caoUser", function (error, result) {
+            if (callback) {
+                callback(error, result);
+            }
+        });
+    });
+};
+
 module.exports = DataManager;
