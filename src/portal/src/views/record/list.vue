@@ -1,5 +1,18 @@
 <template>
+  
   <div class="app-container">
+    <div>
+      <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
+        <el-form-item label="时间" prop="createdDate">
+        <el-date-picker v-model="form.createdDate" type="date" placeholder="选择日期">
+        </el-date-picker>
+      </el-form-item>
+      
+      <el-form-item>
+        <el-button type="primary" @click="search()">查询</el-button>
+      </el-form-item>
+      </el-form>
+    </div>
     <el-table
       v-loading="loading"
       :data="content"
@@ -55,10 +68,7 @@ export default {
       formLabelWidth: "120px",
       oliCompanies: [],
       form: {
-        name: "",
-        address: "",
-        oliCompany: "",
-        id: ""
+        createdDate: new Date(),
       },
       rules: {
         name: [{ required: true, message: "请输入站点名称", trigger: "blur" }],
@@ -78,12 +88,14 @@ export default {
       this.getRecords();
     },
     getRecords() {
+      var date = this.form.createdDate;
       request({
-        url: "/records",
+        url: "/searchrecords",
         method: "get",
         params: {
           size: this.pageSize,
-          page: this.currentPage - 1
+          page: this.currentPage - 1,
+          date: date
         }
       })
         .then(response => {
@@ -97,7 +109,28 @@ export default {
         });
     },
     edit(id) {
-      this.$router.push({ name: "Edit", params: { id: id } });
+      this.$router.push({ name: "EditCaoRecord", params: { id: id } });
+    },
+    search(){
+      var date = this.form.createdDate;
+      request({
+        url: "/searchrecords",
+        method: "get",
+        params: {
+          size: this.pageSize,
+          page: this.currentPage - 1,
+          date: date
+        }
+      })
+        .then(response => {
+          this.content = response.content;
+          this.total = response.total;
+          this.loading = false;
+        })
+        .catch(error => {
+          this.loading = false;
+          console.log(error);
+        });
     }
   }
 };

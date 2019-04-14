@@ -1,17 +1,29 @@
 <template>
   <div class="app-container">
     <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
+      <el-form-item label="时间" prop="createdDate">
+        <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间">
+        </el-date-picker>
+      </el-form-item>
+
       <el-form-item label="姓名" prop="name">
-        <el-input v-model="form.name" placeholder="姓名"/>
+        <el-select v-model="form.name" size="small">
+          <el-option v-for="item in options"
+          :key="item.id"
+          :label="item.name"
+          :value="item.name"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="车牌" prop="plateNumber">
         <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌"/>
       </el-form-item>
-      <el-form-item label="总重" prop="totalWeight">
-        <el-input v-model="form.totalWeight" auto-complete="off" placeholder="总重"/>
-      </el-form-item>
       <el-form-item label="皮重" prop="tareWeight">
         <el-input v-model="form.tareWeight" auto-complete="off" placeholder="皮重"/>
+      </el-form-item>
+      <el-form-item label="总重" prop="totalWeight">
+        <el-input v-model="form.totalWeight" auto-complete="off" placeholder="总重"/>
       </el-form-item>
       <el-form-item label="净重" prop="netWeight">
         <el-input v-model="form.netWeight" auto-complete="off" placeholder="净重"/>
@@ -42,16 +54,13 @@ export default {
     return {
       content: [],
       loading: true,
+      options:[
+        ],
       form: {
         id: 0,
-        name: "limin",
-        plateNumber: "粤A U846V",
-        totalWeight: Math.ceil(100 + Math.random() * 10000),
-        tareWeight: 200,
-        netWeight: 800,
-        price: 2000,
-        paid: 1500,
-        unpaid: 500
+        name: "",
+        plateNumber: "",
+        tareWeight: "",
       },
       total: 0,
       pageSize: 10,
@@ -61,11 +70,12 @@ export default {
       oliCompanies: [],
       rules: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        createdDate: [{ required: true, message: "请输入时间", trigger: "blur" }],
         plateNumber: [
           { required: true, message: "请输入车牌号", trigger: "blur" }
         ],
-        totalWeight: [
-          { required: true, message: "请输入总重", trigger: "blur" }
+        tareWeight: [
+          { required: true, message: "请输入皮重", trigger: "blur" }
         ]
       }
     };
@@ -77,8 +87,23 @@ export default {
   },
   mounted() {
     this.refresh();
+    this.getCaoUsers();
   },
   methods: {
+    getCaoUsers(){
+      var self = this;
+      request({
+              url: "/allcaousers",
+              method: "get",
+            })
+              .then(response => {
+                self.options = response;
+                this.loading = false;
+              })
+              .catch(error => {
+                console.log(error);
+              });
+    },
     refresh() {
       var self = this;
       var id = this.$route.params.id;

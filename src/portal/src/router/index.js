@@ -61,7 +61,7 @@ export const constantRouterMap = [
       },
       {
         path: 'edit/:id',
-        name: 'Edit',
+        name: 'EditUser',
         component: () => import('@/views/caouser/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
@@ -90,7 +90,7 @@ export const constantRouterMap = [
       },
       {
         path: 'edit/:id',
-        name: 'Edit',
+        name: 'EditCaoRecord',
         component: () => import('@/views/record/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true

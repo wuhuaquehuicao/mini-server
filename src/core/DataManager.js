@@ -155,9 +155,11 @@ DataManager.prototype.updateUser = function (id, user, callback) {
 
 DataManager.prototype.addRecord = function (record, callback) {
     var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO record (name, plateNumber,totalWeight,tareWeight,netWeight,price,paid,unpaid) VALUES (?,?,?,?,?,?,?,?)",
-            record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, function (error, result) {
+        db.run("INSERT INTO record (name, plateNumber,totalWeight,tareWeight,netWeight,price,paid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -174,8 +176,8 @@ DataManager.prototype.addRecord = function (record, callback) {
 DataManager.prototype.updateRecord = function (id, record, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("UPDATE record SET name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,paid=?,unpaid=?,modifiedDate=?  WHERE id = ?",
-            [record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid,
+        db.run("UPDATE record SET name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,paid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, record.createDate,
             new Date().format("yyyy-MM-dd hh:mm:ss"), id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -205,9 +207,9 @@ DataManager.prototype.getRecords = function (query, callback) {
         page = parseInt(query.page);
     var offset = page * size;
     db.serialize(function () {
-        db.all("SELECT * FROM record order by id desc limit ? offset ?", [size, offset], function (error, result) {
+        db.all("SELECT * FROM record order by modifiedDate desc limit ? offset ?", [size, offset], function (error, result) {
             if (callback) {
-                self.getRecordsCount((err, res) => {
+                self.getRecordsCount(NULL,(err, res) => {
                     if (!error) {
                         var data = {};
                         data["content"] = result;
@@ -221,13 +223,58 @@ DataManager.prototype.getRecords = function (query, callback) {
     });
 };
 
-DataManager.prototype.getRecordsCount = function (callback) {
+DataManager.prototype.searchRecords = function (query, callback) {
+    var self = this;
+    var size = 50;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.date);
+    var toDate = getSearchToDate(query.date);
     db.serialize(function () {
-        db.get("SELECT count(*) as total FROM record", function (error, result) {
+        db.all("SELECT * FROM record WHERE createdDate BETWEEN ? AND ? order by modifiedDate DESC limit ? offset ?", [fromDate, toDate, size, offset],  function (error, result) {
             if (callback) {
-                callback(error, result);
+                self.getRecordsCount(query.date, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
             }
         });
+    });
+};
+
+DataManager.prototype.getRecordsCount = function (date, callback) {
+    db.serialize(function () {
+        var searchString;
+        var fromDate;
+        var toDate;
+        if(date){
+            fromDate = getSearchFromDate(date);
+            toDate = getSearchToDate(date);
+            searchString = "SELECT count(*) as total FROM record WHERE createdDate BETWEEN ? AND ? order by modifiedDate DESC";
+            db.get(searchString, [fromDate, toDate], function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        else{
+            searchString = "SELECT count(*) as total FROM record";
+            db.get(searchString, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        
     });
 };
 
@@ -272,6 +319,17 @@ DataManager.prototype.getCaoUser = function (id, callback) {
     });
 };
 
+DataManager.prototype.getAllCaoUsers = function(query, callback){
+    var self = this;
+    db.serialize(function () {
+        db.all("SELECT * FROM caoUser order by id desc", function (error, result) {
+            if (callback) {
+                callback(error, result);
+            }
+        });
+    });
+};
+
 DataManager.prototype.getCaoUsers = function (query, callback) {
     var self = this;
     var size = 10;
@@ -307,5 +365,16 @@ DataManager.prototype.getCaoUsersCount = function (callback) {
         });
     });
 };
+
+getSearchFromDate = function(date){
+    var searchFromDate = new Date(date).format("yyyy-MM-dd");
+    return searchFromDate;
+};
+
+getSearchToDate = function(date){
+    var toDate = new Date(new Date(date).getTime() + 24*60*60*1000);
+    var searchToDate= new Date(toDate).format("yyyy-MM-dd");
+    return searchToDate;
+}
 
 module.exports = DataManager;

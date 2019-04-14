@@ -90,7 +90,7 @@ export default {
         });
     },
     edit(id) {
-      this.$router.push({ name: "Edit", params: { id: id } });
+      this.$router.push({ name: "EditUser", params: { id: id } });
     }
   }
 };
