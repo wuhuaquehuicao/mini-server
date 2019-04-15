@@ -7,6 +7,17 @@
         <el-date-picker v-model="form.createdDate" type="date" placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
+
+      <el-form-item label="" prop="kilnName" >
+        <el-select v-model="form.kilnName" size="small">
+          <el-option v-for="item in kilnsOptions"
+          :key="item.id"
+          :label="item.kilnName"
+          :value="item.kilnName"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
       
       <el-form-item>
         <el-button type="primary" @click="search()">查询</el-button>
@@ -21,18 +32,18 @@
       stripe
       border
     >
-      <el-table-column prop="id" label="ID" width="50"/>
+      <el-table-column prop="id" label="ID" width="50" v-if= "false"/>
       <el-table-column prop="name" label="姓名" width="150"/>
-      <el-table-column prop="plateNumber" label="车牌号" width="100"/>
-      <el-table-column prop="totalWeight" label="总重" width="60"/>
-      <el-table-column prop="tareWeight" label="皮重" width="60"/>
-      <el-table-column prop="netWeight" label="净重" width="60"/>
-      <el-table-column prop="price" label="价格" width="60"/>
-      <el-table-column prop="paid" label="已支付" width="60"/>
-      <el-table-column prop="unpaid" label="未支付" width="60"/>
+      <el-table-column prop="plateNumber" label="车牌号" width="80"/>
+      <el-table-column prop="totalWeight" label="总重" width="80"/>
+      <el-table-column prop="tareWeight" label="皮重" width="80"/>
+      <el-table-column prop="netWeight" label="净重" width="80"/>
+      <el-table-column prop="price" label="总价" width="100"/>
+      <el-table-column prop="paid" label="已支付" width="100"/>
+      <el-table-column prop="unpaid" label="未支付" width="100"/>
       <el-table-column prop="createdDate" label="创建时间"/>
       <el-table-column prop="modifiedDate" label="修改时间"/>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="80">
         <template slot-scope="scope">
           <!-- <el-button @click="$router.push({ name: 'Detail', params: {id: scope.row.id} })">详情</el-button> -->
           <el-button type="primary" @click="edit(scope.row.id)">编辑</el-button>
@@ -49,7 +60,19 @@
       style="margin-top: 15px"
       @current-change="currentChange"
     />
+
+    <div>
+      <el-form ref="form" :inline="true" :model="sumContent" :rules="rules" style="margin-top: 40px;">
+          <el-form-item label="总重量" prop="sumWeight11">
+            <el-input v-model="sumContent.sumWeight" auto-complete="off" v-bind:readonly="true"/>
+          </el-form-item>
+          <el-form-item label="总收入" prop="sumPrice">
+            <el-input v-model="sumContent.sumPrice" auto-complete="off" v-bind:readonly="true"/>
+          </el-form-item>
+      </el-form>
+    </div>
   </div>
+  
 </template>
 <script>
 import request from "@/utils/request";
@@ -60,15 +83,21 @@ export default {
   data() {
     return {
       content: [],
+      sumContent:[],
       loading: true,
       total: 0,
-      pageSize: 10,
+      pageSize: 100,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",
       oliCompanies: [],
+      kilnsOptions:[
+        {id:1, kilnName:"新窑"},
+        {id:2, kilnName:"老窑"},
+      ],
       form: {
         createdDate: new Date(),
+        kilnName: "新窑"
       },
       rules: {
         name: [{ required: true, message: "请输入站点名称", trigger: "blur" }],
@@ -80,27 +109,24 @@ export default {
     };
   },
   created() {
-    this.getRecords();
+    this.search();
+    
+  },
+  mounted() {
+    //this.getKilns();
   },
   methods: {
     currentChange(val) {
       this.currentPage = val;
-      this.getRecords();
+      this.search();
     },
-    getRecords() {
-      var date = this.form.createdDate;
+    getKilns(){
       request({
-        url: "/searchrecords",
-        method: "get",
-        params: {
-          size: this.pageSize,
-          page: this.currentPage - 1,
-          date: date
-        }
+        url: "/kilns",
+        method: "get"
       })
         .then(response => {
-          this.content = response.content;
-          this.total = response.total;
+          this.kilnsOptions = response;
           this.loading = false;
         })
         .catch(error => {
@@ -119,11 +145,13 @@ export default {
         params: {
           size: this.pageSize,
           page: this.currentPage - 1,
-          date: date
+          date: date,
+          kilnName: this.form.kilnName
         }
       })
         .then(response => {
           this.content = response.content;
+          this.sumContent = response.sumContent;
           this.total = response.total;
           this.loading = false;
         })

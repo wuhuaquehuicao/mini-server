@@ -49,7 +49,7 @@ export default {
       content: [],
       loading: true,
       total: 0,
-      pageSize: 10,
+      pageSize: 100,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: '120px',
@@ -74,12 +74,12 @@ export default {
     }
   },
   created() {
-    this.getSite();
-    companies().then((response) => {
-      this.oliCompanies = response.content;
-    }).catch((error) => {
-      console.log(error);
-    });
+    // this.getSite();
+    // companies().then((response) => {
+    //   this.oliCompanies = response.content;
+    // }).catch((error) => {
+    //   console.log(error);
+    // });
   },
   methods: {
     getSite() {

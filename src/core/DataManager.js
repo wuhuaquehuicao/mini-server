@@ -158,8 +158,8 @@ DataManager.prototype.addRecord = function (record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO record (name, plateNumber,totalWeight,tareWeight,netWeight,price,paid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?)",
-            record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO record (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,paid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -175,10 +175,11 @@ DataManager.prototype.addRecord = function (record, callback) {
 
 DataManager.prototype.updateRecord = function (id, record, callback) {
     var self = this;
+    var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE record SET name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,paid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
-            [record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, record.createDate,
-            new Date().format("yyyy-MM-dd hh:mm:ss"), id], function (error, result) {
+        db.run("UPDATE record SET kilnName = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,paid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, record.createdDate,
+            modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -209,7 +210,7 @@ DataManager.prototype.getRecords = function (query, callback) {
     db.serialize(function () {
         db.all("SELECT * FROM record order by modifiedDate desc limit ? offset ?", [size, offset], function (error, result) {
             if (callback) {
-                self.getRecordsCount(NULL,(err, res) => {
+                self.getRecordsCount(NULL, NULL,(err, res) => {
                     if (!error) {
                         var data = {};
                         data["content"] = result;
@@ -232,16 +233,31 @@ DataManager.prototype.searchRecords = function (query, callback) {
     if ("page" in query)
         page = parseInt(query.page);
     var offset = page * size;
-    var fromDate = getSearchFromDate(query.date);
-    var toDate = getSearchToDate(query.date);
+    var selectedDate = query.date;
+    var fromDate = getSearchFromDate(selectedDate);
+    var toDate = getSearchToDate(selectedDate);
+    var kilnName = query.kilnName;
     db.serialize(function () {
-        db.all("SELECT * FROM record WHERE createdDate BETWEEN ? AND ? order by modifiedDate DESC limit ? offset ?", [fromDate, toDate, size, offset],  function (error, result) {
+        db.all("SELECT * FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
             if (callback) {
-                self.getRecordsCount(query.date, (err, res) => {
+                self.getRecordsCount(selectedDate, kilnName, (err, res) => {
                     if (!error) {
                         var data = {};
                         data["content"] = result;
                         data["total"] = res.total;
+                        var sumWeight = 0;
+                        var sumPrice = 0;
+                        var subItem;
+                        for(var i = 0; i< result.length; i++){
+                            subItem = result[i]; 
+                            sumWeight += subItem.netWeight;
+                            sumPrice += subItem.price;
+                        };
+                        var sumContent = {
+                            "sumWeight":sumWeight,
+                            "sumPrice":sumPrice
+                        };
+                        data["sumContent"] = sumContent;
                         return callback(error, data);
                     }
                     callback(error, result);
@@ -251,7 +267,7 @@ DataManager.prototype.searchRecords = function (query, callback) {
     });
 };
 
-DataManager.prototype.getRecordsCount = function (date, callback) {
+DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
     db.serialize(function () {
         var searchString;
         var fromDate;
@@ -259,8 +275,8 @@ DataManager.prototype.getRecordsCount = function (date, callback) {
         if(date){
             fromDate = getSearchFromDate(date);
             toDate = getSearchToDate(date);
-            searchString = "SELECT count(*) as total FROM record WHERE createdDate BETWEEN ? AND ? order by modifiedDate DESC";
-            db.get(searchString, [fromDate, toDate], function (error, result) {
+            searchString = "SELECT count(*) as total FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC";
+            db.get(searchString, [kilnName, fromDate, toDate], function (error, result) {
                 if (callback) {
                     callback(error, result);
                 }
@@ -332,7 +348,7 @@ DataManager.prototype.getAllCaoUsers = function(query, callback){
 
 DataManager.prototype.getCaoUsers = function (query, callback) {
     var self = this;
-    var size = 10;
+    var size = 100;
     var page = 0;
     if ("size" in query)
         size = parseInt(query.size);
@@ -359,6 +375,17 @@ DataManager.prototype.getCaoUsers = function (query, callback) {
 DataManager.prototype.getCaoUsersCount = function (callback) {
     db.serialize(function () {
         db.get("SELECT count(*) as total FROM caoUser", function (error, result) {
+            if (callback) {
+                callback(error, result);
+            }
+        });
+    });
+};
+
+//kiln
+DataManager.prototype.getKilns = function (query, callback) {
+    db.serialize(function () {
+        db.all("SELECT * FROM kiln order by id ASC", function (error, result) {
             if (callback) {
                 callback(error, result);
             }

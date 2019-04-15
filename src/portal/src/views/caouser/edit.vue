@@ -33,7 +33,7 @@ export default {
         phone: "15912223",
       },
       total: 0,
-      pageSize: 10,
+      pageSize: 100,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",
