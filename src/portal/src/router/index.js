@@ -68,7 +68,7 @@ export const constantRouterMap = [
       }
     ]
   },
-  // 记录
+  // 石灰记录
   {
     path: '/record',
     component: Layout,

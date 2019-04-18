@@ -337,8 +337,9 @@ DataManager.prototype.getCaoUser = function (id, callback) {
 
 DataManager.prototype.getAllCaoUsers = function(query, callback){
     var self = this;
+    var userType = query.type;
     db.serialize(function () {
-        db.all("SELECT * FROM caoUser order by id desc", function (error, result) {
+        db.all("SELECT * FROM caoUser WHERE type = ? order by id desc", [userType],function (error, result) {
             if (callback) {
                 callback(error, result);
             }
@@ -355,10 +356,11 @@ DataManager.prototype.getCaoUsers = function (query, callback) {
     if ("page" in query)
         page = parseInt(query.page);
     var offset = page * size;
+    var userType = query.type;
     db.serialize(function () {
-        db.all("SELECT * FROM caoUser order by id desc limit ? offset ?", [size, offset], function (error, result) {
+        db.all("SELECT * FROM caoUser WHERE type = ? order by id desc limit ? offset ?", [userType, size, offset], function (error, result) {
             if (callback) {
-                self.getCaoUsersCount((err, res) => {
+                self.getCaoUsersCount(userType,(err, res) => {
                     if (!error) {
                         var data = {};
                         data["content"] = result;
@@ -372,9 +374,9 @@ DataManager.prototype.getCaoUsers = function (query, callback) {
     });
 };
 
-DataManager.prototype.getCaoUsersCount = function (callback) {
+DataManager.prototype.getCaoUsersCount = function (type, callback) {
     db.serialize(function () {
-        db.get("SELECT count(*) as total FROM caoUser", function (error, result) {
+        db.get("SELECT count(*) as total FROM caoUser WHERE type = ?", [type],function (error, result) {
             if (callback) {
                 callback(error, result);
             }

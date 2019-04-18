@@ -162,6 +162,9 @@ export default {
       request({
               url: "/allcaousers",
               method: "get",
+              params: {
+              type: "石灰"
+            }
             })
               .then(response => {
                 self.usersOptions = response;

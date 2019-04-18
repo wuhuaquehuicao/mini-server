@@ -1,5 +1,23 @@
 <template>
   <div class="app-container">
+    <div>
+      <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
+        <el-form-item label="" prop="type" >
+          <el-select v-model="form.type" size="small">
+            <el-option v-for="item in userTypeOptions"
+            :key="item.type"
+            :label="item.type"
+            :value="item.type"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        
+        <el-form-item>
+          <el-button type="primary" @click="search()">查询</el-button>
+        </el-form-item>
+        </el-form>
+    </div>
     <el-table
       v-loading="loading"
       :data="content"
@@ -41,6 +59,14 @@ export default {
   data() {
     return {
       content: [],
+      userTypeOptions:[
+        {"type":"石灰",
+        },{
+          "type":"石头",
+        },{
+          "type":"煤碳",
+        }
+      ],
       loading: true,
       total: 0,
       pageSize: 100,
@@ -50,9 +76,7 @@ export default {
       oliCompanies: [],
       form: {
         name: "",
-        address: "",
-        oliCompany: "",
-        id: ""
+        type:"石灰"
       },
       rules: {
         name: [{ required: true, message: "请输入站点名称", trigger: "blur" }],
@@ -77,7 +101,8 @@ export default {
         method: "get",
         params: {
           size: this.pageSize,
-          page: this.currentPage - 1
+          page: this.currentPage - 1,
+          type: this.form.type
         }
       })
         .then(response => {
