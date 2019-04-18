@@ -11,6 +11,7 @@
       <el-table-column prop="id" label="ID" width="50"/>
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="phone" label="电话" width="100"/>
+      <el-table-column prop="plateNumber" label="车牌" width="200"/>
       <el-table-column prop="address" label="地址" width="60"/>
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">

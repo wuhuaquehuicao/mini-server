@@ -22,8 +22,8 @@
     </div>
     <el-form ref="form" :inline="true" :model="form" :rules="rules">
       <el-form-item label="姓名" prop="name">
-        <el-select v-model="form.name" size="small">
-          <el-option v-for="item in options"
+        <el-select v-model="form.name" size="small" @change="selectedUser">
+          <el-option v-for="item in usersOptions"
           :key="item.id"
           :label="item.name"
           :value="item.name"
@@ -32,7 +32,14 @@
         </el-select>
       </el-form-item>
       <el-form-item label="车牌" prop="plateNumber">
-        <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌"/>
+        <el-select v-model="form.plateNumber" size="small" clearable>
+          <el-option v-for="item in plateNOptions"
+          :key="item.plateNumber"
+          :label="item.plateNumber"
+          :value="item.plateNumber"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="皮重" prop="tareWeight">
         <el-input v-model="form.tareWeight" auto-complete="off" placeholder="皮重"/>
@@ -74,8 +81,8 @@ export default {
     return {
       content: [],
       loading: true,
-      options:[
-        ],
+      usersOptions:[],
+      plateNOptions:[],
       kilnsOptions:[
         {id:1, kilnName:"新窑"},
         {id:2, kilnName:"老窑"},
@@ -116,6 +123,37 @@ export default {
     this.getCaoUsers();
   },
   methods: {
+    selectedUser(obj)
+    {
+      var self = this;
+      if(obj){
+        for(var i=0; i < self.usersOptions.length; i++){
+          var user = self.usersOptions[i];
+          if(user.name == obj){
+            var plateStr = user.plateNumber;
+            if(plateStr){
+              var plateNArray = plateStr.split(",");
+              var plateNOptions = [];
+              var value;
+              if(plateNArray.length > 0){
+                for(var j=0; j< plateNArray.length;j++){
+                value = plateNArray[j];
+                plateNOptions.push({"plateNumber":value});
+                
+                }
+                self.plateNOptions = plateNOptions;
+              }
+              else{
+                self.plateNOptions = [];
+              }
+            }
+            else{
+              self.plateNOptions = [];
+            }
+          }
+        }
+      }
+    },
     getCaoUsers(){
       var self = this;
       request({
@@ -123,7 +161,7 @@ export default {
               method: "get",
             })
               .then(response => {
-                self.options = response;
+                self.usersOptions = response;
                 this.loading = false;
               })
               .catch(error => {

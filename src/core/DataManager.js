@@ -297,8 +297,8 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
 DataManager.prototype.addCaoUser = function (caoUser, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("INSERT INTO caoUser (name, phone,address) VALUES (?,?,?)",
-            caoUser.name, caoUser.phone, caoUser.address, function (error, result) {
+        db.run("INSERT INTO caoUser (name, phone, plateNumber,address) VALUES (?,?,?,?)",
+            caoUser.name, caoUser.phone, caoUser.plateNumber, caoUser.address, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -315,8 +315,8 @@ DataManager.prototype.addCaoUser = function (caoUser, callback) {
 DataManager.prototype.updateCaoUser = function (id, caoUser, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("UPDATE caoUser SET name = ?, phone = ?, address = ? WHERE id = ?",
-            [caoUser.name, caoUser.phone, caoUser.address, id], function (error, result) {
+        db.run("UPDATE caoUser SET name = ?, phone = ?, plateNumber =?, address = ? WHERE id = ?",
+            [caoUser.name, caoUser.phone, caoUser.plateNumber, caoUser.address, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {

@@ -7,6 +7,9 @@
       <el-form-item label="电话" prop="phone">
         <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
       </el-form-item>
+      <el-form-item label="车牌" prop="plateNumber">
+        <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用逗号分开)"/>
+      </el-form-item>
       <el-form-item label="地址" prop="address">
         <el-input v-model="form.address" auto-complete="off" placeholder="地址"/>
       </el-form-item>
@@ -29,8 +32,9 @@ export default {
       loading: true,
       form: {
         id: 0,
-        name: "limin",
-        phone: "15912223",
+        name: "",
+        phone: "",
+        plateNumber:""
       },
       total: 0,
       pageSize: 100,
@@ -40,8 +44,11 @@ export default {
       oliCompanies: [],
       rules: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        plateNumber: [
+          { required: true, message: "请输入车牌", trigger: "blur" }
+        ],
         phone: [
-          { required: true, message: "请输入电话号码", trigger: "blur" }
+          { required: true, message: "请输入电话号码", trigger: "blur"}
         ],
         address: [
           { required: true, message: "请输入地址", trigger: "blur" }
