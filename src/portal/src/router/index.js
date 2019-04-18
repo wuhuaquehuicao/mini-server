@@ -39,30 +39,30 @@ export const constantRouterMap = [
     }]
   },
 
-  // 石灰客户
+  // 客户
   {
-    path: '/caouser',
+    path: '/dealUser',
     component: Layout,
-    redirect: '/caouser/list',
-    name: 'Caouser',
-    meta: { title: '石灰用户', icon: 'example' },
+    redirect: '/dealUser/list',
+    name: 'Dealuser',
+    meta: { title: '客户', icon: 'example' },
     children: [
       {
         path: 'list',
         name: 'List',
-        component: () => import('@/views/caouser/list'),
+        component: () => import('@/views/dealUser/list'),
         meta: { title: '查看', icon: 'table' }
       },
       {
         path: 'add',
         name: 'Add',
-        component: () => import('@/views/caouser/edit'),
+        component: () => import('@/views/dealUser/edit'),
         meta: { title: '新增', icon: 'table' }
       },
       {
         path: 'edit/:id',
         name: 'EditUser',
-        component: () => import('@/views/caouser/edit'),
+        component: () => import('@/views/dealUser/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
       }

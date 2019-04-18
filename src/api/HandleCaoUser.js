@@ -1,9 +1,9 @@
 var app = require("../main/app");
 
 module.exports = {
-    "/allcaousers": {
+    "/alldealUsers": {
         get: function (req, res, next) {
-            this.db.getAllCaoUsers(req.query,
+            this.db.getAllDealUsers(req.query,
                 function (err, result) {
                     if (err) {
                         next(new errors.InternalServerError());
@@ -19,9 +19,9 @@ module.exports = {
             );
         }
     },
-    "/caousers": {
+    "/dealUsers": {
         get: function (req, res, next) {
-            this.db.getCaoUsers(req.query,
+            this.db.getDealUsers(req.query,
                 function (err, result) {
                     if (err) {
                         next(new errors.InternalServerError());
@@ -37,7 +37,7 @@ module.exports = {
             );
         },
         post: function (req, res, next) {
-            this.db.addCaoUser(req.body,
+            this.db.addDealUser(req.body,
                 function (err, result) {
                     if (err) {
                         next(new errors.InternalServerError());
@@ -54,7 +54,7 @@ module.exports = {
         },
         "/:id": {
             get: function (req, res, next) {
-                this.db.getCaoUser(parseInt(req.params.id),
+                this.db.getDealUser(parseInt(req.params.id),
                     function (err, result) {
                         if (err) {
                             next(new errors.InternalServerError());
@@ -70,7 +70,7 @@ module.exports = {
                 );
             },
             put: function (req, res, next) {
-                this.db.updateCaoUser(parseInt(req.params.id), req.body,
+                this.db.updateDealUser(parseInt(req.params.id), req.body,
                     function (err, result) {
                         if (err) {
                             next(new errors.InternalServerError());

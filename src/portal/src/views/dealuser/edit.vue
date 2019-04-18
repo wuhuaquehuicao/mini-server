@@ -89,7 +89,7 @@ export default {
       if (id != null && id > 0) {
         this.form.id = id;
         request({
-          url: "/caousers/" + id,
+          url: "/dealUsers/" + id,
           method: "get"
         })
           .then(response => {
@@ -110,7 +110,7 @@ export default {
         if (valid) {
           if (self.form.id != null && self.form.id > 0) {
             request({
-              url: "/caousers/" + self.form.id,
+              url: "/dealUsers/" + self.form.id,
               method: "put",
               data: self.form
             })
@@ -126,7 +126,7 @@ export default {
               });
           } else {
             request({
-              url: "/caousers",
+              url: "/dealUsers",
               method: "post",
               data: self.form
             })

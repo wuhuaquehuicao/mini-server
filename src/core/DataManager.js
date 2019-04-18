@@ -294,16 +294,16 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
     });
 };
 
-DataManager.prototype.addCaoUser = function (caoUser, callback) {
+DataManager.prototype.addDealUser = function (dealUser, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("INSERT INTO caoUser (name, type,phone, plateNumber,address) VALUES (?,?,?,?,?)",
-            caoUser.name, caoUser.type, caoUser.phone, caoUser.plateNumber, caoUser.address, function (error, result) {
+        db.run("INSERT INTO dealUser (name, type,phone, plateNumber,address) VALUES (?,?,?,?,?)",
+            dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
-                            caoUser["id"] = this.lastID;
-                            return self.getCaoUser(this.lastID, callback);
+                            dealUser["id"] = this.lastID;
+                            return self.getDealUser(this.lastID, callback);
                         }
                     }
                     callback(error, null);
@@ -312,15 +312,15 @@ DataManager.prototype.addCaoUser = function (caoUser, callback) {
     });
 };
 
-DataManager.prototype.updateCaoUser = function (id, caoUser, callback) {
+DataManager.prototype.updateDealUser = function (id, dealUser, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("UPDATE caoUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ? WHERE id = ?",
-            [caoUser.name, caoUser.type, caoUser.phone, caoUser.plateNumber, caoUser.address, id], function (error, result) {
+        db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ? WHERE id = ?",
+            [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
-                            return self.getCaoUser(id, callback);
+                            return self.getDealUser(id, callback);
                         }
                     }
                     callback(error, null);
@@ -329,17 +329,17 @@ DataManager.prototype.updateCaoUser = function (id, caoUser, callback) {
     });
 };
 
-DataManager.prototype.getCaoUser = function (id, callback) {
+DataManager.prototype.getDealUser = function (id, callback) {
     db.serialize(function () {
-        db.get("SELECT * FROM caoUser WHERE id= ?", [id], callback);
+        db.get("SELECT * FROM dealUser WHERE id= ?", [id], callback);
     });
 };
 
-DataManager.prototype.getAllCaoUsers = function(query, callback){
+DataManager.prototype.getAllDealUsers = function(query, callback){
     var self = this;
     var userType = query.type;
     db.serialize(function () {
-        db.all("SELECT * FROM caoUser WHERE type = ? order by id desc", [userType],function (error, result) {
+        db.all("SELECT * FROM dealUser WHERE type = ? order by id desc", [userType],function (error, result) {
             if (callback) {
                 callback(error, result);
             }
@@ -347,7 +347,7 @@ DataManager.prototype.getAllCaoUsers = function(query, callback){
     });
 };
 
-DataManager.prototype.getCaoUsers = function (query, callback) {
+DataManager.prototype.getDealUsers = function (query, callback) {
     var self = this;
     var size = 100;
     var page = 0;
@@ -358,9 +358,9 @@ DataManager.prototype.getCaoUsers = function (query, callback) {
     var offset = page * size;
     var userType = query.type;
     db.serialize(function () {
-        db.all("SELECT * FROM caoUser WHERE type = ? order by id desc limit ? offset ?", [userType, size, offset], function (error, result) {
+        db.all("SELECT * FROM dealUser WHERE type = ? order by id desc limit ? offset ?", [userType, size, offset], function (error, result) {
             if (callback) {
-                self.getCaoUsersCount(userType,(err, res) => {
+                self.getDealUsersCount(userType,(err, res) => {
                     if (!error) {
                         var data = {};
                         data["content"] = result;
@@ -374,9 +374,9 @@ DataManager.prototype.getCaoUsers = function (query, callback) {
     });
 };
 
-DataManager.prototype.getCaoUsersCount = function (type, callback) {
+DataManager.prototype.getDealUsersCount = function (type, callback) {
     db.serialize(function () {
-        db.get("SELECT count(*) as total FROM caoUser WHERE type = ?", [type],function (error, result) {
+        db.get("SELECT count(*) as total FROM dealUser WHERE type = ?", [type],function (error, result) {
             if (callback) {
                 callback(error, result);
             }

@@ -123,7 +123,7 @@ export default {
   },
   mounted() {
     this.refresh();
-    this.getCaoUsers();
+    this.getDealUsers();
   },
   methods: {
     selectedUser(obj)
@@ -160,10 +160,10 @@ export default {
         }
       }
     },
-    getCaoUsers(){
+    getDealUsers(){
       var self = this;
       request({
-              url: "/allcaousers",
+              url: "/alldealUsers",
               method: "get",
               params: {
               type: "石灰"

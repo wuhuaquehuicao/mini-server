@@ -88,19 +88,19 @@ export default {
     };
   },
   created() {
-    this.getCaoUsers();
+    this.getDealUsers();
   },
   methods: {
     currentChange(val) {
       this.currentPage = val;
-      this.getCaoUsers();
+      this.getDealUsers();
     },
     search(){
-      this.getCaoUsers();
+      this.getDealUsers();
     },
-    getCaoUsers() {
+    getDealUsers() {
       request({
-        url: "/caousers",
+        url: "/dealUsers",
         method: "get",
         params: {
           size: this.pageSize,
