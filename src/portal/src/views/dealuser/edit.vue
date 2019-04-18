@@ -115,7 +115,6 @@ export default {
               data: self.form
             })
               .then(response => {
-                self.form.totalWeight = Math.ceil(100 + Math.random() * 10000);
                 this.$message({
                   message: "更新成功",
                   type: "success"
@@ -131,7 +130,6 @@ export default {
               data: self.form
             })
               .then(response => {
-                self.form.totalWeight = Math.ceil(100 + Math.random() * 10000);
                 this.$message({
                   message: "添加成功",
                   type: "success"

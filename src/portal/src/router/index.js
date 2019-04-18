@@ -94,6 +94,70 @@ export const constantRouterMap = [
         component: () => import('@/views/record/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
+      },
+      {
+        path: 'statistics',
+        name: 'StatisticsCaoRecord',
+        component: () => import('@/views/record/statistics'),
+        meta: { title: '统计', icon: 'table' }
+      }
+    ]
+  },
+  // 石头记录
+  {
+    path: '/tonerecord',
+    component: Layout,
+    redirect: '/tonerecord/list',
+    name: 'ToneRecord',
+    meta: { title: '石头记录', icon: 'example' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/tonerecord/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'Add',
+        component: () => import('@/views/tonerecord/add'),
+        meta: { title: '新增', icon: 'table' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'EditToneRecord',
+        component: () => import('@/views/tonerecord/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
+      }
+    ]
+  },
+  // 煤炭记录
+  {
+    path: '/coalrecord',
+    component: Layout,
+    redirect: '/coalrecord/list',
+    name: 'CoalRecord',
+    meta: { title: '煤炭记录', icon: 'example' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/coalrecord/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'Add',
+        component: () => import('@/views/coalrecord/add'),
+        meta: { title: '新增', icon: 'table' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'EditCoalRecord',
+        component: () => import('@/views/coalrecord/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
       }
     ]
   },

@@ -7,17 +7,6 @@
         <el-date-picker v-model="form.createdDate" type="date" placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
-
-      <el-form-item label="" prop="kilnName" >
-        <el-select v-model="form.kilnName" size="small">
-          <el-option v-for="item in kilnsOptions"
-          :key="item.id"
-          :label="item.kilnName"
-          :value="item.kilnName"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
       
       <el-form-item>
         <el-button type="primary" @click="search()">查询</el-button>
@@ -91,7 +80,7 @@ export default {
       sumContent:[],
       loading: true,
       total: 0,
-      pageSize: 2,
+      pageSize: 100,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",

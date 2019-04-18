@@ -7,18 +7,7 @@
         <el-date-picker v-model="form.createdDate" type="date" placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
-
-      <el-form-item label="" prop="kilnName" >
-        <el-select v-model="form.kilnName" size="small">
-          <el-option v-for="item in kilnsOptions"
-          :key="item.id"
-          :label="item.kilnName"
-          :value="item.kilnName"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      
+            
       <el-form-item>
         <el-button type="primary" @click="search()">查询</el-button>
       </el-form-item>
@@ -34,15 +23,11 @@
     >
       <el-table-column prop="id" label="ID" width="50" v-if= "false"/>
       <el-table-column prop="name" label="姓名" width="150"/>
-      <el-table-column prop="plateNumber" label="车牌号" width="80"/>
-      <el-table-column prop="totalWeight" label="总重" width="80"/>
-      <el-table-column prop="tareWeight" label="皮重" width="80"/>
-      <el-table-column prop="netWeight" label="净重" width="80"/>
-      <el-table-column prop="price" label="总价" width="100"/>
-      <el-table-column prop="cashpaid" label="现金支付" width="100"/>
-      <el-table-column prop="wxpaid" label="微信支付" width="100"/>
-      <el-table-column prop="unpaid" label="未支付" width="100"/>
-      <el-table-column prop="createdDate" label="购买时间">
+      <el-table-column prop="plateNumber" label="车牌号" width="150"/>
+      <el-table-column prop="type" label="石头类型" width="150"/>
+      <el-table-column prop="netWeight" label="净重" width="150"/>
+      <el-table-column prop="recordUser" label="记录人员" width="150"/>
+      <el-table-column prop="createdDate" label="到厂时间">
         <template slot-scope="scope">
             <span>{{ new Date(scope.row.createdDate) | formatDate('hh:mm:ss') }}</span>
         </template>
@@ -91,7 +76,7 @@ export default {
       sumContent:[],
       loading: true,
       total: 0,
-      pageSize: 2,
+      pageSize: 100,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",

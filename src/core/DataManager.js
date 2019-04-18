@@ -153,6 +153,7 @@ DataManager.prototype.updateUser = function (id, user, callback) {
     });
 };
 
+//Handle cao record
 DataManager.prototype.addRecord = function (record, callback) {
     var self = this;
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
@@ -294,6 +295,149 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
     });
 };
 
+//Handle tone record
+DataManager.prototype.addToneRecord = function (toneRecord, callback) {
+    var self = this;
+    var createdDate = new Date(toneRecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("INSERT INTO toneRecord (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            toneRecord.kilnName, toneRecord.name, toneRecord.plateNumber, toneRecord.totalWeight, toneRecord.tareWeight, toneRecord.netWeight, toneRecord.price, toneRecord.cashpaid,toneRecord.wxpaid, toneRecord.unpaid, createdDate, modifiedDate, function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            toneRecord["id"] = this.lastID;
+                            return self.getToneRecord(this.lastID, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.updateToneRecord = function (id, toneRecord, callback) {
+    var self = this;
+    var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("UPDATE toneRecord SET kilnName = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [toneRecord.kilnName, toneRecord.name, toneRecord.plateNumber, toneRecord.totalWeight, toneRecord.tareWeight, toneRecord.netWeight, toneRecord.price, toneRecord.cashpaid,toneRecord.wxpaid, toneRecord.unpaid, toneRecord.createdDate,
+            modifiedDate, id], function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            return self.getToneRecord(id, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.getToneRecord = function (id, callback) {
+    db.serialize(function () {
+        db.get("SELECT * FROM toneRecord WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.getToneRecords = function (query, callback) {
+    var self = this;
+    var size = 10;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    db.serialize(function () {
+        db.all("SELECT * FROM toneRecord order by modifiedDate desc limit ? offset ?", [size, offset], function (error, result) {
+            if (callback) {
+                self.getToneRecordsCount(NULL, NULL,(err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.searchToneRecords = function (query, callback) {
+    var self = this;
+    var size = 50;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var selectedDate = query.date;
+    var fromDate = getSearchFromDate(selectedDate);
+    var toDate = getSearchToDate(selectedDate);
+    var kilnName = query.kilnName;
+    db.serialize(function () {
+        db.all("SELECT * FROM toneRecord WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
+            if (callback) {
+                self.getToneRecordsCount(selectedDate, kilnName, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumWeight = 0;
+                        var sumPrice = 0;
+                        var subItem;
+                        for(var i = 0; i< result.length; i++){
+                            subItem = result[i]; 
+                            sumWeight += subItem.netWeight;
+                            sumPrice += subItem.price;
+                        };
+                        var sumContent = {
+                            "sumWeight":sumWeight,
+                            "sumPrice":sumPrice
+                        };
+                        data["sumContent"] = sumContent;
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getToneRecordsCount = function (date, kilnName, callback) {
+    db.serialize(function () {
+        var searchString;
+        var fromDate;
+        var toDate;
+        if(date){
+            fromDate = getSearchFromDate(date);
+            toDate = getSearchToDate(date);
+            searchString = "SELECT count(*) as total FROM toneRecord WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC";
+            db.get(searchString, [kilnName, fromDate, toDate], function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        else{
+            searchString = "SELECT count(*) as total FROM toneRecord";
+            db.get(searchString, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        
+    });
+};
+
+//Handle deal user
 DataManager.prototype.addDealUser = function (dealUser, callback) {
     var self = this;
     db.serialize(function () {
