@@ -40,7 +40,7 @@
           <el-tag v-for="(value, index) in scope.row.blackBoxs" :key="index" type="primary" style="margin: 2px;">{{ value.name }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createdDate" label="创建时间" width="150"/>
+      <el-table-column prop="createdDate" label="购买时间" width="150"/>
       <el-table-column prop="modifiedDate" label="修改时间" width="150"/>
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">

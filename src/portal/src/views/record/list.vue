@@ -42,7 +42,11 @@
       <el-table-column prop="cashpaid" label="现金支付" width="100"/>
       <el-table-column prop="wxpaid" label="微信支付" width="100"/>
       <el-table-column prop="unpaid" label="未支付" width="100"/>
-      <el-table-column prop="createdDate" label="创建时间"/>
+      <el-table-column prop="createdDate" label="购买时间">
+        <template slot-scope="scope">
+            <span>{{ new Date(scope.row.createdDate) | formatDate('hh:mm:ss') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="modifiedDate" label="修改时间"/>
       <el-table-column label="操作" width="80">
         <template slot-scope="scope">
@@ -77,7 +81,7 @@
 </template>
 <script>
 import request from "@/utils/request";
-import { emptyObject } from "@/utils";
+import { emptyObject} from "@/utils";
 
 export default {
   name: "ListRecord",

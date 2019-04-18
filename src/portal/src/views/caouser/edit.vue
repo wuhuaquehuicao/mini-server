@@ -45,7 +45,7 @@ export default {
         },{
           "type":"石头",
         },{
-          "type":"煤碳",
+          "type":"煤炭",
         }
       ],
       form: {

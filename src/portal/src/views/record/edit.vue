@@ -145,13 +145,16 @@ export default {
                 
                 }
                 self.plateNOptions = plateNOptions;
+                self.form.plateNumber = self.plateNOptions[0].plateNumber;
               }
               else{
                 self.plateNOptions = [];
+                self.form.plateNumber = "";
               }
             }
             else{
               self.plateNOptions = [];
+              self.form.plateNumber = "";
             }
           }
         }

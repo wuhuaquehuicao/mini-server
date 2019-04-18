@@ -26,7 +26,7 @@
       stripe
       border
     >
-      <el-table-column prop="id" label="ID" width="50"/>
+      <el-table-column prop="id" label="ID" width="50" v-if="false"/>
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="phone" label="电话" width="100"/>
       <el-table-column prop="plateNumber" label="车牌" width="200"/>
@@ -64,7 +64,7 @@ export default {
         },{
           "type":"石头",
         },{
-          "type":"煤碳",
+          "type":"煤炭",
         }
       ],
       loading: true,
@@ -93,6 +93,9 @@ export default {
   methods: {
     currentChange(val) {
       this.currentPage = val;
+      this.getCaoUsers();
+    },
+    search(){
       this.getCaoUsers();
     },
     getCaoUsers() {
