@@ -56,7 +56,7 @@ export const constantRouterMap = [
       {
         path: 'add',
         name: 'Add',
-        component: () => import('@/views/dealUser/edit'),
+        component: () => import('@/views/dealUser/add'),
         meta: { title: '新增', icon: 'table' }
       },
       {
@@ -85,7 +85,7 @@ export const constantRouterMap = [
       {
         path: 'add',
         name: 'Add',
-        component: () => import('@/views/record/edit'),
+        component: () => import('@/views/record/add'),
         meta: { title: '新增', icon: 'table' }
       },
       {
