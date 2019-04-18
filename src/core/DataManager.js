@@ -40,7 +40,7 @@ function DataManager() {
         if (!exists) {
             db.run("CREATE TABLE IF NOT EXISTS user   (id INTEGER primary key, name TEXT, email TEXT, mobile TEXT, password TEXT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
             db.run("CREATE TABLE IF NOT EXISTS report (id INTEGER primary key, userId INT,currenttask TEXT,nextplan TEXT,blockissue TEXT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
-            db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
+            db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
             var admin = {
                 name: "Admin",
                 email: "admin@gfan.cn",
@@ -158,8 +158,8 @@ DataManager.prototype.addRecord = function (record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO record (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,paid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-            record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO record (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -177,8 +177,8 @@ DataManager.prototype.updateRecord = function (id, record, callback) {
     var self = this;
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE record SET kilnName = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,paid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
-            [record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, record.createdDate,
+        db.run("UPDATE record SET kilnName = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, record.createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -297,8 +297,8 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
 DataManager.prototype.addCaoUser = function (caoUser, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("INSERT INTO caoUser (name, phone, plateNumber,address) VALUES (?,?,?,?)",
-            caoUser.name, caoUser.phone, caoUser.plateNumber, caoUser.address, function (error, result) {
+        db.run("INSERT INTO caoUser (name, type,phone, plateNumber,address) VALUES (?,?,?,?,?)",
+            caoUser.name, caoUser.type, caoUser.phone, caoUser.plateNumber, caoUser.address, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -315,8 +315,8 @@ DataManager.prototype.addCaoUser = function (caoUser, callback) {
 DataManager.prototype.updateCaoUser = function (id, caoUser, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("UPDATE caoUser SET name = ?, phone = ?, plateNumber =?, address = ? WHERE id = ?",
-            [caoUser.name, caoUser.phone, caoUser.plateNumber, caoUser.address, id], function (error, result) {
+        db.run("UPDATE caoUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ? WHERE id = ?",
+            [caoUser.name, caoUser.type, caoUser.phone, caoUser.plateNumber, caoUser.address, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {

@@ -39,7 +39,8 @@
       <el-table-column prop="tareWeight" label="皮重" width="80"/>
       <el-table-column prop="netWeight" label="净重" width="80"/>
       <el-table-column prop="price" label="总价" width="100"/>
-      <el-table-column prop="paid" label="已支付" width="100"/>
+      <el-table-column prop="cashpaid" label="现金支付" width="100"/>
+      <el-table-column prop="wxpaid" label="微信支付" width="100"/>
       <el-table-column prop="unpaid" label="未支付" width="100"/>
       <el-table-column prop="createdDate" label="创建时间"/>
       <el-table-column prop="modifiedDate" label="修改时间"/>

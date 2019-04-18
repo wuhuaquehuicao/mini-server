@@ -53,8 +53,11 @@
       <el-form-item label="总价" prop="price">
         <el-input v-model="form.price" auto-complete="off" placeholder="总价"/>
       </el-form-item>
-      <el-form-item label="已付款" prop="paid">
-        <el-input v-model="form.paid" auto-complete="off" placeholder="已付款"/>
+      <el-form-item label="现金付款" prop="cashpaid">
+        <el-input v-model="form.cashpaid" auto-complete="off" placeholder="现金付款"/>
+      </el-form-item>
+      <el-form-item label="微信付款" prop="wxpaid">
+        <el-input v-model="form.wxpaid" auto-complete="off" placeholder="微信付款"/>
       </el-form-item>
       <el-form-item label="未付款" prop="unpaid">
         <el-input v-model="form.unpaid" auto-complete="off" placeholder="未付款"/>

@@ -4,6 +4,16 @@
       <el-form-item label="姓名" prop="name">
         <el-input v-model="form.name" placeholder="姓名"/>
       </el-form-item>
+      <el-form-item label="类型" prop="type">
+        <el-select v-model="form.type" size="small">
+            <el-option v-for="item in userTypeOptions"
+            :key="item.type"
+            :label="item.type"
+            :value="item.type"
+            >
+            </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="电话" prop="phone">
         <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
       </el-form-item>
@@ -30,6 +40,14 @@ export default {
     return {
       content: [],
       loading: true,
+      userTypeOptions:[
+        {"type":"石灰",
+        },{
+          "type":"石头",
+        },{
+          "type":"煤碳",
+        }
+      ],
       form: {
         id: 0,
         name: "",
