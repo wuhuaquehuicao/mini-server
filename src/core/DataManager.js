@@ -373,7 +373,7 @@ DataManager.prototype.getPersonRecordsCount = function (query, callback) {
 
     db.serialize(function () {
         var searchString;
-        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record" + searchStr;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
             db.get(searchString, searchData, function (error, result) {
                 if (callback) {
                     callback(error, result);
