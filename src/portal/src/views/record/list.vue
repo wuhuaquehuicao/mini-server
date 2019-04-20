@@ -66,15 +66,27 @@
       @current-change="currentChange"
     />
 
-    <div>
-      <el-form ref="form" :inline="true" :model="sumContent" :rules="rules" style="margin-top: 40px;">
-          <el-form-item label="总重量" prop="sumWeight11">
-            <el-input v-model="sumContent.sumWeight" auto-complete="off" v-bind:readonly="true"/>
-          </el-form-item>
-          <el-form-item label="总收入" prop="sumPrice">
-            <el-input v-model="sumContent.sumPrice" auto-complete="off" v-bind:readonly="true"/>
-          </el-form-item>
-      </el-form>
+      <div>
+        <div>
+          <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 30px;">
+            <el-form-item label="总计:">
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-table
+          v-loading="loading"
+          :data="sumContent"
+          :header-cell-style="{background:'#F5F7FA'}"
+          style="width: 100%"
+          stripe
+          border
+        >
+        <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+        <el-table-column prop="sumPrice" label="总收入" width="120"/>
+        <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
+        <el-table-column prop="sumWxpaid" label="微信支付" width="120"/>
+        <el-table-column prop="sumUnpaid" label="未支付" width="120"/>
+      </el-table>
     </div>
   </div>
   
@@ -91,7 +103,7 @@ export default {
       sumContent:[],
       loading: true,
       total: 0,
-      pageSize: 2,
+      pageSize: 10,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",
@@ -118,7 +130,6 @@ export default {
     
   },
   mounted() {
-    //this.getKilns();
   },
   methods: {
     currentChange(val) {

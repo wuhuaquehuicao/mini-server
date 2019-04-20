@@ -4,27 +4,27 @@
     <el-collapse v-model="activeName" accordion>
         <el-collapse-item title="个人信息统计" name="1">
             <div>
-            <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
-                <el-form-item label="时间" prop="createdDate">
-                <el-date-picker v-model="form.createdDate" type="daterange" placeholder="选择日期" >
+            <el-form ref="personForm" :inline="true" :model="personForm" :rules="rules" style="margin-top: 20px;">
+                <el-form-item label="时间" prop="searchDate">
+                <el-date-picker v-model="personForm.searchDate" type="daterange" placeholder="选择日期" >
                 </el-date-picker>
             </el-form-item>
 
             <el-form-item label="" prop="userName" >
-                <el-select v-model="form.userName" size="small" placeholder="选择姓名" clearable>
-                <el-option v-for="item in userOptions"
-                :key="item.userName"
-                :label="item.userName"
-                :value="item.userName"
+                <el-select v-model="personForm.userName" size="small" placeholder="选择姓名" clearable @change="selectedUser">
+                <el-option v-for="item in usersOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.name"
                 >
                 </el-option>
                 </el-select>
             </el-form-item>
 
             <el-form-item label="" prop="plateNumber" >
-                <el-select v-model="form.plateNumber" size="small" placeholder="选择车牌" clearable>
+                <el-select v-model="personForm.plateNumber" size="small" placeholder="选择车牌" clearable="true">
                 <el-option v-for="item in plateNOptions"
-                :key="item.plateNumber"
+                :key="item.id"
                 :label="item.plateNumber"
                 :value="item.plateNumber"
                 >
@@ -39,7 +39,7 @@
             </div>
             <el-table
             v-loading="loading"
-            :data="content"
+            :data="personContent"
             :header-cell-style="{background:'#F5F7FA'}"
             style="width: 100%"
             stripe
@@ -80,27 +80,39 @@
             />
 
             <div>
-            <el-form ref="form" :inline="true" :model="sumContent" :rules="rules" style="margin-top: 40px;">
-                <el-form-item label="总重量" prop="sumWeight11">
-                    <el-input v-model="sumContent.sumWeight" auto-complete="off" v-bind:readonly="true"/>
-                </el-form-item>
-                <el-form-item label="总收入" prop="sumPrice">
-                    <el-input v-model="sumContent.sumPrice" auto-complete="off" v-bind:readonly="true"/>
+        <div>
+            <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 30px;">
+                <el-form-item label="总计:">
                 </el-form-item>
             </el-form>
             </div>
+            <el-table
+            v-loading="loading"
+            :data="sumPersonContent"
+            :header-cell-style="{background:'#F5F7FA'}"
+            style="width: 100%"
+            stripe
+            border
+            >
+            <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+            <el-table-column prop="sumPrice" label="总收入" width="120"/>
+            <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
+            <el-table-column prop="sumWxpaid" label="微信支付" width="120"/>
+            <el-table-column prop="sumUnpaid" label="未支付" width="120"/>
+            </el-table>
+        </div>
         </el-collapse-item>
 
         <el-collapse-item title="全厂累计统计" name="2">
             <div>
             <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
                 <el-form-item label="时间" prop="createdDate">
-                <el-date-picker v-model="form.createdDate" type="daterange" placeholder="选择日期" >
+                <el-date-picker v-model="factoryForm.createdDate" type="daterange" placeholder="选择日期" >
                 </el-date-picker>
             </el-form-item>
 
             <el-form-item label="" prop="kilnName" >
-                <el-select v-model="form.kilnName" size="small" clearable>
+                <el-select v-model="factoryForm.kilnName" size="small" clearable placeholder="选择窑名">
                 <el-option v-for="item in kilnsOptions"
                 :key="item.id"
                 :label="item.kilnName"
@@ -117,7 +129,7 @@
             </div>
             <el-table
             v-loading="loading"
-            :data="content"
+            :data="factoryContent"
             :header-cell-style="{background:'#F5F7FA'}"
             style="width: 100%"
             stripe
@@ -141,16 +153,27 @@
             style="margin-top: 15px"
             @current-change="currentChange"
             />
-
             <div>
-            <el-form ref="form" :inline="true" :model="sumContent" :rules="rules" style="margin-top: 40px;">
-                <el-form-item label="总重量" prop="sumWeight11">
-                    <el-input v-model="sumContent.sumWeight" auto-complete="off" v-bind:readonly="true"/>
-                </el-form-item>
-                <el-form-item label="总收入" prop="sumPrice">
-                    <el-input v-model="sumContent.sumPrice" auto-complete="off" v-bind:readonly="true"/>
-                </el-form-item>
-            </el-form>
+               <div>
+                    <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 30px;">
+                        <el-form-item label="总计:">
+                        </el-form-item>
+                    </el-form>
+                    </div>
+                    <el-table
+                    v-loading="loading"
+                    :data="sumFactoryContent"
+                    :header-cell-style="{background:'#F5F7FA'}"
+                    style="width: 100%"
+                    stripe
+                    border
+                    >
+                    <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+                    <el-table-column prop="sumPrice" label="总收入" width="120"/>
+                    <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
+                    <el-table-column prop="sumWxpaid" label="微信支付" width="120"/>
+                    <el-table-column prop="sumUnpaid" label="未支付" width="120"/>
+                    </el-table>     
             </div>
         </el-collapse-item>
     </el-collapse>
@@ -164,8 +187,10 @@ export default {
   name: "ListRecord",
   data() {
     return {
-      content: [],
-      sumContent:[],
+      personContent: [],
+      sumPersonContent:[],
+      factoryContent: [],
+      sumFactoryContent:[],
       activeName: '1',
       loading: false,
       total: 0,
@@ -174,31 +199,82 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: "120px",
       oliCompanies: [],
+      usersOptions: [
+      ],
       kilnsOptions:[
         {id:1, kilnName:"新窑"},
         {id:2, kilnName:"老窑"},
       ],
-      form: {
-        createdDate: new Date(),
-        kilnName: "新窑"
+      personForm: {
+      },
+      factoryForm: {
       },
       rules: {
-        name: [{ required: true, message: "请输入站点名称", trigger: "blur" }],
-        address: [
-          { required: true, message: "请选择站点地址", trigger: "blur" }
-        ],
-        oliCompany: [{ required: true, message: "请选择公司", trigger: "blur" }]
       }
     };
   },
   created() {
   },
   mounted() {
+      this.getDealUsers();
   },
   methods: {
     currentChange(val) {
       this.currentPage = val;
       this.search();
+    },
+    selectedUser(obj)
+    {
+      var self = this;
+      if(obj){
+        for(var i=0; i < self.usersOptions.length; i++){
+          var user = self.usersOptions[i];
+          if(user.name == obj){
+            var plateStr = user.plateNumber;
+            if(plateStr){
+              var plateNArray = plateStr.split(",");
+              var plateNOptions = [];
+              var value;
+              var key;
+              if(plateNArray.length > 0){
+                for(var j=0; j< plateNArray.length;j++){
+                value = plateNArray[j];
+                key = ""+j;
+                plateNOptions.push({"id":key, "plateNumber":value});
+                
+                }
+                self.plateNOptions = plateNOptions;
+                self.personForm.plateNumber = self.plateNOptions[0].plateNumber;
+              }
+              else{
+                self.plateNOptions = [];
+                self.personForm.plateNumber = "";
+              }
+            }
+            else{
+              self.plateNOptions = [];
+              self.personForm.plateNumber = "";
+            }
+          }
+        }
+      }
+    },
+    getDealUsers(){
+      var self = this;
+      request({
+              url: "/alldealUsers",
+              method: "get",
+              params: {
+              type: "石灰"
+            }
+            })
+              .then(response => {
+                self.usersOptions = response;
+                this.loading = false;
+              })
+              .catch(error => {
+                console.log(error);
+              });
     },
     getKilns(){
       request({
@@ -218,20 +294,32 @@ export default {
       this.$router.push({ name: "EditCaoRecord", params: { id: id } });
     },
     personSearch(){
-      var date = this.form.createdDate;
-      request({
-        url: "/searchrecords",
-        method: "get",
-        params: {
+      var fromDate = this.personForm.searchDate[0];
+      var toDate = this.personForm.searchDate[1];
+      var params = {
           size: this.pageSize,
           page: this.currentPage - 1,
-          date: date,
-          kilnName: this.form.kilnName
-        }
+          fromDate:fromDate,
+          toDate:toDate
+      };
+      
+      var userName = this.personForm.userName;
+      var plateNumber = this.personForm.plateNumber;
+      if(userName){
+          params["userName"] = userName;
+      }
+      if(plateNumber){
+          params["plateNumber"] = plateNumber;
+      }
+
+      request({
+        url: "/searchPersonRecords",
+        method: "get",
+        params: params
       })
         .then(response => {
-          this.content = response.content;
-          this.sumContent = response.sumContent;
+          this.personContent = response.content;
+          this.sumPersonContent = response.sumContent;
           this.total = response.total;
           this.loading = false;
         })
@@ -240,8 +328,8 @@ export default {
           console.log(error);
         });
     },
-    historySearch(){
-      var date = this.form.createdDate;
+    factorySearch(){
+      var date = this.factoryForm.createdDate;
       request({
         url: "/searchrecords",
         method: "get",
@@ -249,12 +337,12 @@ export default {
           size: this.pageSize,
           page: this.currentPage - 1,
           date: date,
-          kilnName: this.form.kilnName
+          kilnName: this.factoryForm.kilnName
         }
       })
         .then(response => {
-          this.content = response.content;
-          this.sumContent = response.sumContent;
+          this.factoryContent = response.content;
+          this.sumFactoryContent = response.sumContent;
           this.total = response.total;
           this.loading = false;
         })

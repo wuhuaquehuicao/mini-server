@@ -246,19 +246,14 @@ DataManager.prototype.searchRecords = function (query, callback) {
                         var data = {};
                         data["content"] = result;
                         data["total"] = res.total;
-                        var sumWeight = 0;
-                        var sumPrice = 0;
-                        var subItem;
-                        for(var i = 0; i< result.length; i++){
-                            subItem = result[i]; 
-                            sumWeight += subItem.netWeight;
-                            sumPrice += subItem.price;
-                        };
                         var sumContent = {
-                            "sumWeight":sumWeight,
-                            "sumPrice":sumPrice
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
+                            "sumCashpaid":res.sumCashpaid,
+                            "sumWxpaid":res.sumWxpaid,
+                            "sumUnpaid":res.sumUnpaid
                         };
-                        data["sumContent"] = sumContent;
+                        data["sumContent"] = [sumContent];
                         return callback(error, data);
                     }
                     callback(error, result);
@@ -276,7 +271,7 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
         if(date){
             fromDate = getSearchFromDate(date);
             toDate = getSearchToDate(date);
-            searchString = "SELECT count(*) as total FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC";
+            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC";
             db.get(searchString, [kilnName, fromDate, toDate], function (error, result) {
                 if (callback) {
                     callback(error, result);
@@ -292,6 +287,96 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
             });
         }
         
+    });
+};
+
+//search personRecord
+DataManager.prototype.searchPersonRecords = function (query, callback) {
+    var self = this;
+    var size = 50;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    
+    var searchStr = "SELECT * FROM record WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getPersonRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
+                            "sumCashpaid":res.sumCashpaid,
+                            "sumWxpaid":res.sumWxpaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getPersonRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
     });
 };
 
