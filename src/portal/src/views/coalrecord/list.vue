@@ -104,10 +104,8 @@ export default {
   },
   created() {
     this.search();
-    
   },
   mounted() {
-    //this.getKilns();
   },
   methods: {
     currentChange(val) {

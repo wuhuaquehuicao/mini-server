@@ -39,8 +39,10 @@ function DataManager() {
     db.serialize(function () {
         if (!exists) {
             db.run("CREATE TABLE IF NOT EXISTS user   (id INTEGER primary key, name TEXT, email TEXT, mobile TEXT, password TEXT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
-            db.run("CREATE TABLE IF NOT EXISTS report (id INTEGER primary key, userId INT,currenttask TEXT,nextplan TEXT,blockissue TEXT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
-            db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
+            db.run("CREATE TABLE IF NOT EXISTS report (id INTEGER primary key, userId INT,currenttask TEXT,nextplan TEXT,blockissue TEXT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME)");
+            db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+            db.run("CREATE TABLE IF NOT EXISTS tonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
+            db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, createdDate DATETIME, modifiedDate DATETIME)");
             var admin = {
                 name: "Admin",
                 email: "admin@gfan.cn",
@@ -371,7 +373,7 @@ DataManager.prototype.getPersonRecordsCount = function (query, callback) {
 
     db.serialize(function () {
         var searchString;
-        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record" + searchStr;
             db.get(searchString, searchData, function (error, result) {
                 if (callback) {
                     callback(error, result);

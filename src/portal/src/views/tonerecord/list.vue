@@ -7,7 +7,7 @@
         <el-date-picker v-model="form.createdDate" type="date" placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
-            
+
       <el-form-item>
         <el-button type="primary" @click="search()">查询</el-button>
       </el-form-item>
@@ -100,10 +100,8 @@ export default {
   },
   created() {
     this.search();
-    
   },
   mounted() {
-    //this.getKilns();
   },
   methods: {
     currentChange(val) {
