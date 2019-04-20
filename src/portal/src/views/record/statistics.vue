@@ -24,7 +24,7 @@
             <el-form-item label="" prop="plateNumber" >
                 <el-select v-model="personForm.plateNumber" size="small" placeholder="选择车牌" clearable="true">
                 <el-option v-for="item in plateNOptions"
-                :key="item.id"
+                :key="item.plateNumber"
                 :label="item.plateNumber"
                 :value="item.plateNumber"
                 >
@@ -206,6 +206,8 @@ export default {
         {id:2, kilnName:"老窑"},
       ],
       personForm: {
+        plateNumber: "",
+        userName : ""
       },
       factoryForm: {
       },
@@ -235,12 +237,10 @@ export default {
               var plateNArray = plateStr.split(",");
               var plateNOptions = [];
               var value;
-              var key;
               if(plateNArray.length > 0){
                 for(var j=0; j< plateNArray.length;j++){
                 value = plateNArray[j];
-                key = ""+j;
-                plateNOptions.push({"id":key, "plateNumber":value});
+                plateNOptions.push({"plateNumber":value});
                 
                 }
                 self.plateNOptions = plateNOptions;

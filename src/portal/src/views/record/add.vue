@@ -93,7 +93,8 @@ export default {
       form: {
         id: 0,
         createdDate: new Date(),
-        kilnName:"新窑"
+        kilnName:"新窑",
+        plateNumber:""
       },
       total: 0,
       pageSize: 100,
