@@ -103,7 +103,7 @@ export default {
       sumContent:[],
       loading: true,
       total: 0,
-      pageSize: 10,
+      pageSize: 100,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",

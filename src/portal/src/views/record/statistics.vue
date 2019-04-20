@@ -51,16 +51,17 @@
             <el-table-column prop="totalWeight" label="总重" width="80"/>
             <el-table-column prop="tareWeight" label="皮重" width="80"/>
             <el-table-column prop="netWeight" label="净重" width="80"/>
-            <el-table-column prop="price" label="总价" width="100"/>
-            <el-table-column prop="cashpaid" label="现金支付" width="100"/>
-            <el-table-column prop="wxpaid" label="微信支付" width="100"/>
-            <el-table-column prop="unpaid" label="未支付" width="100"/>
+            <el-table-column prop="price" label="总价" width="80"/>
+            <el-table-column prop="cashpaid" label="现金支付" width="80"/>
+            <el-table-column prop="wxpaid" label="微信支付" width="80"/>
+            <el-table-column prop="unpaid" label="未支付" width="80"/>
             <el-table-column prop="createdDate" label="购买时间">
                 <template slot-scope="scope">
                     <span>{{ new Date(scope.row.createdDate) | formatDate('hh:mm:ss') }}</span>
                 </template>
             </el-table-column>
             <el-table-column prop="modifiedDate" label="修改时间"/>
+            <el-table-column prop="kilnName" label="窑名" width="60"/>
             <el-table-column label="操作" width="80">
                 <template slot-scope="scope">
                 <!-- <el-button @click="$router.push({ name: 'Detail', params: {id: scope.row.id} })">详情</el-button> -->
@@ -70,13 +71,13 @@
             </el-table>
             <el-pagination
             :current-page="0"
-            :total="total"
-            :page-size="pageSize"
+            :total="personTotal"
+            :page-size="personPageSize"
             layout="prev, pager, next"
             background
             center
             style="margin-top: 15px"
-            @current-change="currentChange"
+            @current-change="personCurrentChange"
             />
 
             <div>
@@ -106,8 +107,8 @@
         <el-collapse-item title="全厂累计统计" name="2">
             <div>
             <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
-                <el-form-item label="时间" prop="createdDate">
-                <el-date-picker v-model="factoryForm.createdDate" type="daterange" placeholder="选择日期" >
+                <el-form-item label="时间" prop="searchDate">
+                <el-date-picker v-model="factoryForm.searchDate" type="daterange" placeholder="选择日期" >
                 </el-date-picker>
             </el-form-item>
 
@@ -145,13 +146,13 @@
             </el-table>
             <el-pagination
             :current-page="0"
-            :total="total"
-            :page-size="pageSize"
+            :total="factoryTotal"
+            :page-size="factoryPageSize"
             layout="prev, pager, next"
             background
             center
             style="margin-top: 15px"
-            @current-change="currentChange"
+            @current-change="factoryCurrentChange"
             />
             <div>
                <div>
@@ -193,9 +194,13 @@ export default {
       sumFactoryContent:[],
       activeName: '1',
       loading: false,
-      total: 0,
-      pageSize: 100,
-      currentPage: 1,
+      personTotal: 0,
+      personPageSize: 100,
+      personCurrentPage: 1,
+
+      factoryTotal:0,
+      factoryPageSize: 100,
+      factoryCurrentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",
       oliCompanies: [],
@@ -221,9 +226,13 @@ export default {
       this.getDealUsers();
   },
   methods: {
-    currentChange(val) {
-      this.currentPage = val;
-      this.search();
+    personCurrentChange(val) {
+      this.personCurrentPage = val;
+      this.personSearch();
+    },  
+    factoryCurrentChange(val) {
+      this.factoryCurrentPage = val;
+      this.factorySearch();
     },
     selectedUser(obj)
     {
@@ -297,8 +306,8 @@ export default {
       var fromDate = this.personForm.searchDate[0];
       var toDate = this.personForm.searchDate[1];
       var params = {
-          size: this.pageSize,
-          page: this.currentPage - 1,
+          size: this.personPageSize,
+          page: this.personCurrentPage - 1,
           fromDate:fromDate,
           toDate:toDate
       };
@@ -320,7 +329,7 @@ export default {
         .then(response => {
           this.personContent = response.content;
           this.sumPersonContent = response.sumContent;
-          this.total = response.total;
+          this.personTotal = response.total;
           this.loading = false;
         })
         .catch(error => {
@@ -329,21 +338,29 @@ export default {
         });
     },
     factorySearch(){
-      var date = this.factoryForm.createdDate;
+      var fromDate = this.factoryForm.searchDate[0];
+      var toDate = this.factoryForm.searchDate[1];
+      var params = {
+          size: this.factoryPageSize,
+          page: this.factoryCurrentPage - 1,
+          fromDate:fromDate,
+          toDate:toDate
+      };
+      
+      var kilnName = this.factoryForm.kilnName;
+      if(kilnName){
+          params["kilnName"] = kilnName;
+      }
+
       request({
-        url: "/searchrecords",
+        url: "/searchFactoryRecords",
         method: "get",
-        params: {
-          size: this.pageSize,
-          page: this.currentPage - 1,
-          date: date,
-          kilnName: this.factoryForm.kilnName
-        }
+        params: params
       })
         .then(response => {
           this.factoryContent = response.content;
           this.sumFactoryContent = response.sumContent;
-          this.total = response.total;
+          this.factoryTotal = response.total;
           this.loading = false;
         })
         .catch(error => {

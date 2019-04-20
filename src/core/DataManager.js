@@ -40,9 +40,6 @@ function DataManager() {
         if (!exists) {
             db.run("CREATE TABLE IF NOT EXISTS user   (id INTEGER primary key, name TEXT, email TEXT, mobile TEXT, password TEXT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME DEFAULT (datetime('now','localtime')))");
             db.run("CREATE TABLE IF NOT EXISTS report (id INTEGER primary key, userId INT,currenttask TEXT,nextplan TEXT,blockissue TEXT, createdDate DATETIME DEFAULT (datetime('now','localtime')), modifiedDate DATETIME)");
-            db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT, createdDate DATETIME, modifiedDate DATETIME)");
-            db.run("CREATE TABLE IF NOT EXISTS tonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
-            db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, createdDate DATETIME, modifiedDate DATETIME)");
             var admin = {
                 name: "Admin",
                 email: "admin@gfan.cn",
@@ -51,6 +48,11 @@ function DataManager() {
             }
             db.run("INSERT INTO user (name, email,mobile,password) VALUES (?,?,?,?)", admin.name, admin.email, admin.mobile, admin.password);
         }
+
+        db.run("CREATE TABLE IF NOT EXISTS dealUser (id INTEGER primary key, name TEXT, plateNumber TEXT, phone TEXT, address TEXT, type TEXT, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS tonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
 
@@ -159,7 +161,7 @@ DataManager.prototype.updateUser = function (id, user, callback) {
 DataManager.prototype.addRecord = function (record, callback) {
     var self = this;
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
-    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
+    var modifiedDate =  createdDate;
     db.serialize(function () {
         db.run("INSERT INTO record (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
             record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
@@ -203,7 +205,7 @@ DataManager.prototype.getRecord = function (id, callback) {
 
 DataManager.prototype.getRecords = function (query, callback) {
     var self = this;
-    var size = 10;
+    var size = 100;
     var page = 0;
     if ("size" in query)
         size = parseInt(query.size);
@@ -229,7 +231,7 @@ DataManager.prototype.getRecords = function (query, callback) {
 
 DataManager.prototype.searchRecords = function (query, callback) {
     var self = this;
-    var size = 50;
+    var size = 100;
     var page = 0;
     if ("size" in query)
         size = parseInt(query.size);
@@ -295,7 +297,7 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
 //search personRecord
 DataManager.prototype.searchPersonRecords = function (query, callback) {
     var self = this;
-    var size = 50;
+    var size = 100;
     var page = 0;
     if ("size" in query)
         size = parseInt(query.size);
@@ -382,6 +384,83 @@ DataManager.prototype.getPersonRecordsCount = function (query, callback) {
     });
 };
 
+//Search factoryRecord
+DataManager.prototype.searchFactoryRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var kilnName = query.kilnName;
+    
+    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(cashpaid) AS cashpaid ,SUM(wxpaid) AS wxpaid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM record WHERE ";
+    var searchData = [];
+    if(kilnName){
+        searchStr += "kilnName = ? AND ";
+        searchData.push(kilnName);
+    }
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate DESC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getFactoryRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = 2;//res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
+                            "sumCashpaid":res.sumCashpaid,
+                            "sumWxpaid":res.sumWxpaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getFactoryRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var kilnName = query.kilnName;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(kilnName){
+        searchStr += "kilnName = ? AND ";
+        searchData.push(kilnName);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
 //Handle tone record
 DataManager.prototype.addToneRecord = function (toneRecord, callback) {
     var self = this;
@@ -430,7 +509,7 @@ DataManager.prototype.getToneRecord = function (id, callback) {
 
 DataManager.prototype.getToneRecords = function (query, callback) {
     var self = this;
-    var size = 10;
+    var size = 100;
     var page = 0;
     if ("size" in query)
         size = parseInt(query.size);
@@ -456,7 +535,7 @@ DataManager.prototype.getToneRecords = function (query, callback) {
 
 DataManager.prototype.searchToneRecords = function (query, callback) {
     var self = this;
-    var size = 50;
+    var size = 100;
     var page = 0;
     if ("size" in query)
         size = parseInt(query.size);
@@ -527,9 +606,10 @@ DataManager.prototype.getToneRecordsCount = function (date, kilnName, callback) 
 //Handle deal user
 DataManager.prototype.addDealUser = function (dealUser, callback) {
     var self = this;
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss"); 
     db.serialize(function () {
-        db.run("INSERT INTO dealUser (name, type,phone, plateNumber,address) VALUES (?,?,?,?,?)",
-            dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, function (error, result) {
+        db.run("INSERT INTO dealUser (name, type,phone, plateNumber,address,modifiedDate) VALUES (?,?,?,?,?,?)",
+            dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, deal.modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -546,8 +626,8 @@ DataManager.prototype.addDealUser = function (dealUser, callback) {
 DataManager.prototype.updateDealUser = function (id, dealUser, callback) {
     var self = this;
     db.serialize(function () {
-        db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ? WHERE id = ?",
-            [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, id], function (error, result) {
+        db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ?, modifiedDate = ? WHERE id = ?",
+            [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, dealUser.modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -570,7 +650,7 @@ DataManager.prototype.getAllDealUsers = function(query, callback){
     var self = this;
     var userType = query.type;
     db.serialize(function () {
-        db.all("SELECT * FROM dealUser WHERE type = ? order by id desc", [userType],function (error, result) {
+        db.all("SELECT * FROM dealUser WHERE type = ? order by modifiedDate desc", [userType],function (error, result) {
             if (callback) {
                 callback(error, result);
             }
