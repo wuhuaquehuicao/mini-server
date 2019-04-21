@@ -12,7 +12,7 @@ const store = new Store({
 });
 
 var fs = require('fs');
-var file = 'record.db';
+var file = 'recordData.db';
 var exists = fs.existsSync(file);
 var db = new sqlite3.Database(file);
 
