@@ -50,9 +50,9 @@ function DataManager() {
         }
 
         db.run("CREATE TABLE IF NOT EXISTS dealUser (id INTEGER primary key, name TEXT, plateNumber TEXT, phone TEXT, address TEXT, type TEXT, modifiedDate DATETIME)");
-        db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT,type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS stonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
-        db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
 
@@ -706,6 +706,294 @@ DataManager.prototype.getFactoryStoneRecordsCount = function (query, callback) {
     db.serialize(function () {
         var searchString;
         searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight FROM stonerecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
+//Handle coal record
+DataManager.prototype.addCoalRecord = function (record, callback) {
+    var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("INSERT INTO coalrecord (name, plateNumber, type, totalWeight,tareWeight,netWeight,price,paid,unpaid,note,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            record.name, record.plateNumber, record.type, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, record.note,createdDate, modifiedDate, function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            record["id"] = this.lastID;
+                            self.updateDealUserUpdateTime(record.name);
+                            return self.getCoalRecord(this.lastID, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.updateCoalRecord = function (id, record, callback) {
+    var self = this;
+    var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("UPDATE coalrecord SET name = ?, plateNumber = ?, type = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,paid=?,unpaid=?, createdDate=?,modifiedDate=? ,note=? WHERE id = ?",
+            [record.name, record.plateNumber, record.type, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, record.createdDate,
+            modifiedDate, record.note, id], function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            return self.getCoalRecord(id, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.getCoalRecord = function (id, callback) {
+    db.serialize(function () {
+        db.get("SELECT * FROM coalrecord WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.searchCoalRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var selectedDate = query.date;
+    var fromDate = getSearchFromDate(selectedDate);
+    var toDate = getSearchToDate(selectedDate);
+    db.serialize(function () {
+        db.all("SELECT * FROM coalrecord WHERE createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?", [fromDate, toDate, size, offset],  function (error, result) {
+            if (callback) {
+                self.getCoalRecordsCount(selectedDate, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
+                            "sumPaid":res.sumPaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getCoalRecordsCount = function (date, callback) {
+    db.serialize(function () {
+        var searchString;
+        var fromDate;
+        var toDate;
+        if(date){
+            fromDate = getSearchFromDate(date);
+            toDate = getSearchToDate(date);
+            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(paid) AS sumPaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM coalrecord WHERE createdDate BETWEEN ? AND ?";
+            db.get(searchString, [fromDate, toDate], function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        else{
+            searchString = "SELECT count(*) as total FROM coalrecord";
+            db.get(searchString, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        
+    });
+};
+
+//search personRecord
+DataManager.prototype.searchPersonCoalRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    var coalType = query.type;
+    
+    var searchStr = "SELECT * FROM coalrecord WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+
+    if(coalType){
+        searchStr += "type = ? AND ";
+        searchData.push(coalType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getPersonCoalRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
+                            "sumPaid":res.sumPaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getPersonCoalRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    var coalType = query.type;
+
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+
+    if(coalType){
+        searchStr += "type = ? AND ";
+        searchData.push(coalType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(paid) AS sumPaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM coalrecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
+//Search factoryRecord
+DataManager.prototype.searchFactoryCoalRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var coalType = query.type;
+
+    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(paid) AS paid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM coalrecord WHERE ";
+    var searchData = [];
+    if(coalType){
+        searchStr += "type = ? AND ";
+        searchData.push(coalType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate DESC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getFactoryCoalRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
+                            "sumPaid":res.sumPaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getFactoryCoalRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var coalType = query.type;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(coalType){
+        searchStr += "type = ? AND ";
+        searchData.push(coalType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight ,SUM(paid) AS sumPaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM coalrecord " + searchStr;
             db.get(searchString, searchData, function (error, result) {
                 if (callback) {
                     callback(error, result);

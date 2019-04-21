@@ -1,20 +1,13 @@
 <template>
   <div class="app-container">
+      <div style="margin-bottom: 20px; font-size:16px">
+      <span>新增煤炭记录：</span>
+    </div>
+
     <div>
       <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
-        <el-form-item label="" prop="kilnName" >
-          <el-select v-model="form.kilnName" size="small">
-            <el-option v-for="item in kilnsOptions"
-            :key="item.id"
-            :label="item.kilnName"
-            :value="item.kilnName"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-
         <el-form-item label="时间" prop="createdDate">
-        <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间">
+        <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间" :clearable = "false">
         </el-date-picker>
       </el-form-item>
 
@@ -41,6 +34,16 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="产地" prop="type" >
+                <el-select v-model="form.type" size="small" :clearable="true" placeholder="选择产地">
+                <el-option v-for="item in coalTypeOptions"
+                :key="item.type"
+                :label="item.type"
+                :value="item.type"
+                >
+                </el-option>
+                </el-select>
+        </el-form-item>
       <el-form-item label="皮重" prop="tareWeight">
         <el-input v-model="form.tareWeight" auto-complete="off" placeholder="皮重"/>
       </el-form-item>
@@ -53,19 +56,19 @@
       <el-form-item label="总价" prop="price">
         <el-input v-model="form.price" auto-complete="off" placeholder="总价"/>
       </el-form-item>
-      <el-form-item label="现金付款" prop="cashpaid">
-        <el-input v-model="form.cashpaid" auto-complete="off" placeholder="现金付款"/>
-      </el-form-item>
-      <el-form-item label="微信付款" prop="wxpaid">
-        <el-input v-model="form.wxpaid" auto-complete="off" placeholder="微信付款"/>
+      <el-form-item label="已付款" prop="paid">
+        <el-input v-model="form.paid" auto-complete="off" placeholder="已付款"/>
       </el-form-item>
       <el-form-item label="未付款" prop="unpaid">
         <el-input v-model="form.unpaid" auto-complete="off" placeholder="未付款"/>
       </el-form-item>
+      <el-form-item label="备注" prop="note">
+        <el-input v-model="form.note" auto-complete="off" placeholder="备注信息"/>
+      </el-form-item>
     </el-form>
 
     <div>
-      <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
+      <el-form :rules="rules" style="margin-top: 20px;">
         <el-form-item>
         <el-button type="primary" @click="add" v-if="form.id>0">更新</el-button>
         <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
@@ -86,17 +89,15 @@ export default {
       loading: true,
       usersOptions:[],
       plateNOptions:[],
-      kilnsOptions:[
-        {id:1, kilnName:"新窑"},
-        {id:2, kilnName:"老窑"},
+      coalTypeOptions:[
+        {type:"福建"},
+        {type:"山西"},
       ],
       form: {
         id: 0,
-        name: "",
         createdDate: new Date(),
-        plateNumber: "",
-        tareWeight: "",
-        kilnName:"新窑"
+        plateNumber:"",
+        type:"福建"
       },
       total: 0,
       pageSize: 100,
@@ -110,9 +111,6 @@ export default {
         plateNumber: [
           { required: true, message: "请输入车牌号", trigger: "blur" }
         ],
-        tareWeight: [
-          { required: true, message: "请输入皮重", trigger: "blur" }
-        ]
       }
     };
   },
@@ -166,7 +164,7 @@ export default {
               url: "/alldealUsers",
               method: "get",
               params: {
-              type: "石灰"
+              type: "煤炭"
             }
             })
               .then(response => {
@@ -183,7 +181,7 @@ export default {
       if (id != null && id > 0) {
         this.form.id = id;
         request({
-          url: "/records/" + id,
+          url: "/coalrecords/" + id,
           method: "get"
         })
           .then(response => {
@@ -204,7 +202,7 @@ export default {
         if (valid) {
           if (self.form.id != null && self.form.id > 0) {
             request({
-              url: "/records/" + self.form.id,
+              url: "/coalrecords/" + self.form.id,
               method: "put",
               data: self.form
             })
@@ -219,11 +217,18 @@ export default {
               });
           } else {
             request({
-              url: "/records",
+              url: "/coalrecords",
               method: "post",
               data: self.form
             })
               .then(response => {
+                this.form = {
+                    id: 0,
+                    createdDate: new Date(),
+                    name:"",
+                    plateNumber:"",
+                };
+                this.loading = false;
                 this.$message({
                   message: "添加成功",
                   type: "success"

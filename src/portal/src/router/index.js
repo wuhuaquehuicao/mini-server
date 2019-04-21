@@ -164,6 +164,12 @@ export const constantRouterMap = [
         component: () => import('@/views/coalrecord/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
+      },
+      {
+        path: 'statistics',
+        name: 'StatisticsCoalRecord',
+        component: () => import('@/views/coalrecord/statistics'),
+        meta: { title: '统计', icon: 'table' }
       }
     ]
   },

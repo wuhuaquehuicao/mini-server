@@ -28,12 +28,12 @@
       </el-table-column>
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="plateNumber" label="车牌号" width="80"/>
+      <el-table-column prop="type" label="产地" width="80"/>
       <el-table-column prop="totalWeight" label="总重" width="80"/>
       <el-table-column prop="tareWeight" label="皮重" width="80"/>
       <el-table-column prop="netWeight" label="净重" width="80"/>
       <el-table-column prop="price" label="总价" width="100"/>
-      <el-table-column prop="cashpaid" label="现金支付" width="100"/>
-      <el-table-column prop="wxpaid" label="微信支付" width="100"/>
+      <el-table-column prop="paid" label="已支付" width="100"/>
       <el-table-column prop="unpaid" label="未支付" width="100"/>
       <el-table-column prop="createdDate" label="购买时间">
         <template slot-scope="scope">
@@ -60,14 +60,25 @@
     />
 
     <div>
-      <el-form ref="form" :inline="true" :model="sumContent" :rules="rules" style="margin-top: 40px;">
-          <el-form-item label="总重量" prop="sumWeight11">
-            <el-input v-model="sumContent.sumWeight" auto-complete="off" v-bind:readonly="true"/>
-          </el-form-item>
-          <el-form-item label="总收入" prop="sumPrice">
-            <el-input v-model="sumContent.sumPrice" auto-complete="off" v-bind:readonly="true"/>
-          </el-form-item>
-      </el-form>
+        <div>
+          <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 30px;">
+            <el-form-item label="总计:">
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-table
+          v-loading="loading"
+          :data="sumContent"
+          :header-cell-style="{background:'#F5F7FA'}"
+          style="width: 100%"
+          stripe
+          border
+        >
+        <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+        <el-table-column prop="sumPrice" label="总收入" width="120"/>
+        <el-table-column prop="sumPaid" label="已支付" width="120"/>
+        <el-table-column prop="sumUnpaid" label="未支付" width="120"/>
+      </el-table>
     </div>
   </div>
   
@@ -95,7 +106,6 @@ export default {
       ],
       form: {
         createdDate: new Date(),
-        kilnName: "新窑"
       },
       rules: {
         name: [{ required: true, message: "请输入站点名称", trigger: "blur" }],
@@ -131,12 +141,12 @@ export default {
         });
     },
     edit(id) {
-      this.$router.push({ name: "EditCaoRecord", params: { id: id } });
+      this.$router.push({ name: "EditCoalRecord", params: { id: id } });
     },
     search(){
       var date = this.form.createdDate;
       request({
-        url: "/searchrecords",
+        url: "/searchCoalRecords",
         method: "get",
         params: {
           size: this.pageSize,

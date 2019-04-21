@@ -1,7 +1,7 @@
 var app = require("../main/app");
 
 module.exports = {
-    "/coalRecords": {
+    "/coalrecords": {
         get: function (req, res, next) {
             this.db.getCoalRecords(req.query,
                 function (err, result) {
@@ -72,6 +72,42 @@ module.exports = {
     "/searchCoalRecords": {
         get: function (req, res, next) {
             this.db.searchCoalRecords(req.query,
+                function (err, result) {
+                    if (err) {
+                        next(new errors.InternalServerError());
+                    } else {
+                        res.writeHead(200, {
+                            "Content-type": "application/json; charset=UTF-8"
+                        });
+                        res.write(JSON.stringify(result));
+                        res.end();
+                        next();
+                    }
+                }
+            );
+        },
+    },
+    "/searchPersonCoalRecords": {
+        get: function (req, res, next) {
+            this.db.searchPersonCoalRecords(req.query,
+                function (err, result) {
+                    if (err) {
+                        next(new errors.InternalServerError());
+                    } else {
+                        res.writeHead(200, {
+                            "Content-type": "application/json; charset=UTF-8"
+                        });
+                        res.write(JSON.stringify(result));
+                        res.end();
+                        next();
+                    }
+                }
+            );
+        },
+    },
+    "/searchFactoryCoalRecords": {
+        get: function (req, res, next) {
+            this.db.searchFactoryCoalRecords(req.query,
                 function (err, result) {
                     if (err) {
                         next(new errors.InternalServerError());

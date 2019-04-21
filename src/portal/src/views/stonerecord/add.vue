@@ -224,6 +224,15 @@ export default {
               data: self.form
             })
               .then(response => {
+                this.form = {
+                    id: 0,
+                    name: "",
+                    createdDate: new Date(),
+                    plateNumber: "",
+                    netWeight: "",
+                    recordUser:"远兰",
+                    type:"大石"
+                  },
                 this.$message({
                   message: "添加成功",
                   type: "success"
