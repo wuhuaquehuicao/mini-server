@@ -6,7 +6,7 @@
             <div>
             <el-form ref="personForm" :inline="true" :model="personForm" :rules="rules" style="margin-top: 20px;">
                 <el-form-item label="时间" prop="searchDate">
-                <el-date-picker v-model="personForm.searchDate" type="daterange" placeholder="选择日期" >
+                <el-date-picker v-model="personForm.searchDate" type="daterange" placeholder="选择日期" :clearable = "false">
                 </el-date-picker>
             </el-form-item>
 
@@ -45,7 +45,11 @@
             stripe
             border
             >
-            <el-table-column prop="id" label="ID" width="50" v-if= "false"/>
+            <el-table-column type="index" label="序号" width="50">
+                <template slot-scope="scope">
+                    <span>{{(personCurrentPage - 1) * personPageSize + scope.$index + 1}}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
             <el-table-column prop="plateNumber" label="车牌号" width="80"/>
             <el-table-column prop="totalWeight" label="总重" width="80"/>
@@ -56,9 +60,6 @@
             <el-table-column prop="wxpaid" label="微信支付" width="80"/>
             <el-table-column prop="unpaid" label="未支付" width="80"/>
             <el-table-column prop="createdDate" label="购买时间">
-                <template slot-scope="scope">
-                    <span>{{ new Date(scope.row.createdDate) | formatDate('hh:mm:ss') }}</span>
-                </template>
             </el-table-column>
             <el-table-column prop="modifiedDate" label="修改时间"/>
             <el-table-column prop="kilnName" label="窑名" width="60"/>
@@ -81,8 +82,8 @@
             />
 
             <div>
-        <div>
-            <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 30px;">
+            <div style="margin-top: 30px">
+            <el-form :inline="true" >
                 <el-form-item label="总计:">
                 </el-form-item>
             </el-form>
@@ -106,7 +107,7 @@
 
         <el-collapse-item title="全厂累计统计" name="2">
             <div>
-            <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
+            <el-form ref="factoryForm" :inline="true" :model="factoryForm" :rules="rules" style="margin-top: 20px;">
                 <el-form-item label="时间" prop="searchDate">
                 <el-date-picker v-model="factoryForm.searchDate" type="daterange" placeholder="选择日期" >
                 </el-date-picker>
@@ -136,7 +137,11 @@
             stripe
             border
             >
-            <el-table-column prop="id" label="ID" width="50" v-if= "false"/>
+            <el-table-column type="index" label="序号" width="50">
+                <template slot-scope="scope">
+                    <span>{{(factoryCurrentPage - 1) * factoryPageSize + scope.$index + 1}}</span>
+                 </template>
+            </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
             <el-table-column prop="netWeight" label="净重" width="150"/>
             <el-table-column prop="price" label="总价" width="150"/>
@@ -156,7 +161,7 @@
             />
             <div>
                <div>
-                    <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 30px;">
+                    <el-form ref="form" :inline="true" :model="form" style="margin-top: 30px;">
                         <el-form-item label="总计:">
                         </el-form-item>
                     </el-form>
@@ -215,8 +220,12 @@ export default {
         userName : ""
       },
       factoryForm: {
+          kilnName:""
       },
       rules: {
+          searchDate: [{ required: true, message: "请选择时间", trigger: "blur" }],
+          userName: [{ required: true, message: "请选择姓名", trigger: "blur" }],
+          plateNumber: [{ required: true, message: "请选择车牌", trigger: "blur"}],
       }
     };
   },

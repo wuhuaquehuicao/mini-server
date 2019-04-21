@@ -26,11 +26,16 @@
       stripe
       border
     >
-      <el-table-column prop="id" label="ID" width="50" v-if="false"/>
+      <el-table-column type="index" label="序号" width="50">
+        <template slot-scope="scope">
+          <span>{{(currentPage - 1) * pageSize + scope.$index + 1}}</span>
+       </template>
+      </el-table-column>
       <el-table-column prop="name" label="姓名" width="150"/>
-      <el-table-column prop="phone" label="电话" width="100"/>
+      <el-table-column prop="phone" label="电话" width="120"/>
       <el-table-column prop="plateNumber" label="车牌" width="200"/>
-      <el-table-column prop="address" label="地址" width="60"/>
+      <el-table-column prop="address" label="地址" width="200"/>
+      <el-table-column prop="modifiedDate" label="修改时间" width="200"/>
       <el-table-column label="操作" width="150">
         <template slot-scope="scope">
           <!-- <el-button @click="$router.push({ name: 'Detail', params: {id: scope.row.id} })">详情</el-button> -->

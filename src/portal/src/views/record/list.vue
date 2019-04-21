@@ -32,7 +32,11 @@
       stripe
       border
     >
-      <el-table-column prop="id" label="ID" width="50" v-if= "false"/>
+      <el-table-column type="index" label="序号" width="50">
+        <template slot-scope="scope">
+          <span>{{(currentPage - 1) * pageSize + scope.$index + 1}}</span>
+       </template>
+      </el-table-column>
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="plateNumber" label="车牌号" width="80"/>
       <el-table-column prop="totalWeight" label="总重" width="80"/>

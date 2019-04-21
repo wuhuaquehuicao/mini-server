@@ -169,6 +169,7 @@ DataManager.prototype.addRecord = function (record, callback) {
                     if (!error) {
                         if (this.changes == 1) {
                             record["id"] = this.lastID;
+                            self.updateDealUserUpdateTime(record.name);
                             return self.getRecord(this.lastID, callback);
                         }
                     }
@@ -243,7 +244,7 @@ DataManager.prototype.searchRecords = function (query, callback) {
     var toDate = getSearchToDate(selectedDate);
     var kilnName = query.kilnName;
     db.serialize(function () {
-        db.all("SELECT * FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
+        db.all("SELECT * FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
             if (callback) {
                 self.getRecordsCount(selectedDate, kilnName, (err, res) => {
                     if (!error) {
@@ -609,7 +610,7 @@ DataManager.prototype.addDealUser = function (dealUser, callback) {
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss"); 
     db.serialize(function () {
         db.run("INSERT INTO dealUser (name, type,phone, plateNumber,address,modifiedDate) VALUES (?,?,?,?,?,?)",
-            dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, deal.modifiedDate, function (error, result) {
+            dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -625,9 +626,10 @@ DataManager.prototype.addDealUser = function (dealUser, callback) {
 
 DataManager.prototype.updateDealUser = function (id, dealUser, callback) {
     var self = this;
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss"); 
     db.serialize(function () {
         db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ?, modifiedDate = ? WHERE id = ?",
-            [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, dealUser.modifiedDate, id], function (error, result) {
+            [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -643,6 +645,19 @@ DataManager.prototype.updateDealUser = function (id, dealUser, callback) {
 DataManager.prototype.getDealUser = function (id, callback) {
     db.serialize(function () {
         db.get("SELECT * FROM dealUser WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.updateDealUserUpdateTime = function (name, callback) {
+    db.serialize(function () {
+        db.get("SELECT * FROM dealUser WHERE name= ?", [name], function (error, result){
+        var id = result.id;
+        var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss"); 
+        db.serialize(function () {
+            db.run("UPDATE dealUser SET modifiedDate = ? WHERE id = ?",
+                [modifiedDate, id]);
+            });
+        });
     });
 };
 

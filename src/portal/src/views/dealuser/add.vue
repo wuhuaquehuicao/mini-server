@@ -23,11 +23,16 @@
       <el-form-item label="地址" prop="address">
         <el-input v-model="form.address" auto-complete="off" placeholder="地址"/>
       </el-form-item>
-      <el-form-item>
+    </el-form>
+
+    <div>
+      <el-form :rules="rules" style="margin-top: 20px;">
+        <el-form-item>
         <el-button type="primary" @click="add" v-if="form.id>0">更新</el-button>
         <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
       </el-form-item>
-    </el-form>
+      </el-form>
+    </div>
   </div>
 </template>
 <script>
@@ -62,6 +67,7 @@ export default {
       oliCompanies: [],
       rules: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        type: [{ required: true, message: "请选择类型", trigger: "blur" }],
         plateNumber: [
           { required: true, message: "请输入车牌", trigger: "blur" }
         ],
@@ -130,6 +136,12 @@ export default {
               data: self.form
             })
               .then(response => {
+                this.form = {
+                    id: 0,
+                    name: "",
+                    phone: "",
+                    plateNumber:""
+                };
                 this.$message({
                   message: "添加成功",
                   type: "success"

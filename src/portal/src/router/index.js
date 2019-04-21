@@ -43,26 +43,26 @@ export const constantRouterMap = [
   {
     path: '/dealUser',
     component: Layout,
-    redirect: '/dealUser/list',
+    redirect: '/dealuser/list',
     name: 'Dealuser',
     meta: { title: '客户', icon: 'example' },
     children: [
       {
         path: 'list',
         name: 'List',
-        component: () => import('@/views/dealUser/list'),
+        component: () => import('@/views/dealuser/list'),
         meta: { title: '查看', icon: 'table' }
       },
       {
         path: 'add',
         name: 'Add',
-        component: () => import('@/views/dealUser/add'),
+        component: () => import('@/views/dealuser/add'),
         meta: { title: '新增', icon: 'table' }
       },
       {
         path: 'edit/:id',
         name: 'EditUser',
-        component: () => import('@/views/dealUser/edit'),
+        component: () => import('@/views/dealuser/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
       }

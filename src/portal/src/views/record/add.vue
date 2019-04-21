@@ -14,7 +14,7 @@
         </el-form-item>
 
         <el-form-item label="时间" prop="createdDate">
-        <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间">
+        <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间" :clearable = "false">
         </el-date-picker>
       </el-form-item>
 
@@ -65,10 +65,10 @@
     </el-form>
 
     <div>
-      <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
+      <el-form :rules="rules" style="margin-top: 20px;">
         <el-form-item>
         <el-button type="primary" @click="add" v-if="form.id>0">更新</el-button>
-        <el-button type="primary" @click="add" v-if="form.id==0" :disabled="form.name == NULL || form.plateNumber == NULL || form.tareWeight <= 0 || form.tareWeight == NULL">添加</el-button>
+        <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
       </el-form-item>
       </el-form>
     </div>
@@ -222,6 +222,13 @@ export default {
               data: self.form
             })
               .then(response => {
+                this.form = {
+                    id: 0,
+                    createdDate: new Date(),
+                    kilnName:"新窑",
+                    plateNumber:""
+                };
+                this.loading = false;
                 this.$message({
                   message: "添加成功",
                   type: "success"
