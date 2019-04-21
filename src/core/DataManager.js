@@ -52,7 +52,7 @@ function DataManager() {
         db.run("CREATE TABLE IF NOT EXISTS dealUser (id INTEGER primary key, name TEXT, plateNumber TEXT, phone TEXT, address TEXT, type TEXT, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT,type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS stonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
-        db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
 
@@ -163,8 +163,8 @@ DataManager.prototype.addRecord = function (record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO record (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-            record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO record (kilnName, type, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            record.kilnName, record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -183,8 +183,8 @@ DataManager.prototype.updateRecord = function (id, record, callback) {
     var self = this;
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE record SET kilnName = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
-            [record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, record.createdDate,
+        db.run("UPDATE record SET kilnName = ?, type = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.kilnName,record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, record.createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -218,7 +218,7 @@ DataManager.prototype.searchRecords = function (query, callback) {
     var toDate = getSearchToDate(selectedDate);
     var kilnName = query.kilnName;
     db.serialize(function () {
-        db.all("SELECT * FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
+        db.all("SELECT * FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by type DESC, createdDate ASC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
             if (callback) {
                 self.getRecordsCount(selectedDate, kilnName, (err, res) => {
                     if (!error) {
@@ -283,7 +283,7 @@ DataManager.prototype.searchPersonRecords = function (query, callback) {
     var toDate = getSearchToDate(query.toDate);
     var userName = query.userName;
     var plateNumber = query.plateNumber;
-    
+
     var searchStr = "SELECT * FROM record WHERE ";
     var searchData = [];
     if(userName){
@@ -296,6 +296,12 @@ DataManager.prototype.searchPersonRecords = function (query, callback) {
         searchData.push(plateNumber);
     }
     
+    var caoType = query.type;
+    if(caoType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoType);
+    }
+
     searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
@@ -343,7 +349,13 @@ DataManager.prototype.getPersonRecordsCount = function (query, callback) {
         searchStr += "plateNumber = ? AND ";
         searchData.push(plateNumber);
     }
-    
+
+    var caoType = query.type;
+    if(caoType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoType);
+    }
+
     searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
     searchData.push(fromDate);
     searchData.push(toDate);
@@ -379,6 +391,13 @@ DataManager.prototype.searchFactoryRecords = function (query, callback) {
         searchStr += "kilnName = ? AND ";
         searchData.push(kilnName);
     }
+
+    var caoType = query.type;
+    if(caoType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoType);
+    }
+
     searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate DESC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
@@ -419,6 +438,12 @@ DataManager.prototype.getFactoryRecordsCount = function (query, callback) {
     if(kilnName){
         searchStr += "kilnName = ? AND ";
         searchData.push(kilnName);
+    }
+
+    var caoType = query.type;
+    if(caoType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoType);
     }
     
     searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";

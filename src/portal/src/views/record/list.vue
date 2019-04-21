@@ -39,6 +39,7 @@
       </el-table-column>
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="plateNumber" label="车牌号" width="80"/>
+      <el-table-column prop="type" label="灰类" width="80"/>
       <el-table-column prop="totalWeight" label="总重" width="80"/>
       <el-table-column prop="tareWeight" label="皮重" width="80"/>
       <el-table-column prop="netWeight" label="净重" width="80"/>

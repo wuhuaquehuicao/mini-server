@@ -16,6 +16,16 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="" prop="type" >
+          <el-select v-model="form.type" size="small">
+            <el-option v-for="item in typeOptions"
+            :key="item.type"
+            :label="item.type"
+            :value="item.type"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
 
         <el-form-item label="时间" prop="createdDate">
         <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间" :clearable = "false">
@@ -94,11 +104,17 @@ export default {
         {id:1, kilnName:"新窑"},
         {id:2, kilnName:"老窑"},
       ],
+      typeOptions:[
+        {type:"零灰"},
+        {type:"统灰"},
+        {type:"灰粉"},
+      ],
       form: {
         id: 0,
         createdDate: new Date(),
         kilnName:"新窑",
-        plateNumber:""
+        plateNumber:"",
+        type:"零灰"
       },
       total: 0,
       pageSize: 100,
@@ -114,6 +130,9 @@ export default {
         ],
         tareWeight: [
           { required: true, message: "请输入皮重", trigger: "blur" }
+        ],
+        type: [
+          { required: true, message: "请选择灰类", trigger: "blur" }
         ]
       }
     };
@@ -230,7 +249,8 @@ export default {
                     id: 0,
                     createdDate: new Date(),
                     kilnName:"新窑",
-                    plateNumber:""
+                    plateNumber:"",
+                    type:"零灰"
                 };
                 this.loading = false;
                 this.$message({

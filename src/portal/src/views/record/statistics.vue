@@ -31,6 +31,17 @@
                 </el-option>
                 </el-select>
             </el-form-item>
+
+            <el-form-item label="" prop="type" >
+                <el-select v-model="personForm.type" size="small" placeholder="选择灰类" clearable="true">
+                <el-option v-for="item in typeOptions"
+                :key="item.type"
+                :label="item.type"
+                :value="item.type"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
             
             <el-form-item>
                 <el-button type="primary" @click="personSearch()">查询</el-button>
@@ -52,6 +63,7 @@
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
             <el-table-column prop="plateNumber" label="车牌号" width="80"/>
+            <el-table-column prop="type" label="灰类" width="80"/>
             <el-table-column prop="totalWeight" label="总重" width="80"/>
             <el-table-column prop="tareWeight" label="皮重" width="80"/>
             <el-table-column prop="netWeight" label="净重" width="80"/>
@@ -124,6 +136,17 @@
                 </el-select>
             </el-form-item>
             
+            <el-form-item label="" prop="type" >
+                <el-select v-model="personForm.type" size="small" placeholder="选择灰类" clearable="true">
+                <el-option v-for="item in typeOptions"
+                :key="item.type"
+                :label="item.type"
+                :value="item.type"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
+
             <el-form-item>
                 <el-button type="primary" @click="factorySearch()">查询</el-button>
             </el-form-item>
@@ -210,6 +233,11 @@ export default {
       formLabelWidth: "120px",
       oliCompanies: [],
       usersOptions: [
+      ],
+      typeOptions:[
+        {type:"零灰"},
+        {type:"统灰"},
+        {type:"灰粉"},
       ],
       kilnsOptions:[
         {id:1, kilnName:"新窑"},
@@ -323,11 +351,15 @@ export default {
       
       var userName = this.personForm.userName;
       var plateNumber = this.personForm.plateNumber;
+      var type = this.personForm.type;
       if(userName){
           params["userName"] = userName;
       }
       if(plateNumber){
           params["plateNumber"] = plateNumber;
+      }
+      if(type){
+          params["type"] = type;
       }
 
       request({
@@ -357,8 +389,12 @@ export default {
       };
       
       var kilnName = this.factoryForm.kilnName;
+      var type = this.personForm.type;
       if(kilnName){
           params["kilnName"] = kilnName;
+      }
+      if(type){
+          params["type"] = type;
       }
 
       request({
