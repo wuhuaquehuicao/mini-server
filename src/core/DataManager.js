@@ -51,7 +51,7 @@ function DataManager() {
 
         db.run("CREATE TABLE IF NOT EXISTS dealUser (id INTEGER primary key, name TEXT, plateNumber TEXT, phone TEXT, address TEXT, type TEXT, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT, createdDate DATETIME, modifiedDate DATETIME)");
-        db.run("CREATE TABLE IF NOT EXISTS tonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS stonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
@@ -161,7 +161,7 @@ DataManager.prototype.updateUser = function (id, user, callback) {
 DataManager.prototype.addRecord = function (record, callback) {
     var self = this;
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
-    var modifiedDate =  createdDate;
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
         db.run("INSERT INTO record (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
             record.kilnName, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
@@ -201,32 +201,6 @@ DataManager.prototype.updateRecord = function (id, record, callback) {
 DataManager.prototype.getRecord = function (id, callback) {
     db.serialize(function () {
         db.get("SELECT * FROM record WHERE id= ?", [id], callback);
-    });
-};
-
-DataManager.prototype.getRecords = function (query, callback) {
-    var self = this;
-    var size = 100;
-    var page = 0;
-    if ("size" in query)
-        size = parseInt(query.size);
-    if ("page" in query)
-        page = parseInt(query.page);
-    var offset = page * size;
-    db.serialize(function () {
-        db.all("SELECT * FROM record order by modifiedDate desc limit ? offset ?", [size, offset], function (error, result) {
-            if (callback) {
-                self.getRecordsCount(NULL, NULL,(err, res) => {
-                    if (!error) {
-                        var data = {};
-                        data["content"] = result;
-                        data["total"] = res.total;
-                        return callback(error, data);
-                    }
-                    callback(error, result);
-                });
-            }
-        });
     });
 };
 
@@ -462,19 +436,19 @@ DataManager.prototype.getFactoryRecordsCount = function (query, callback) {
     });
 };
 
-//Handle tone record
-DataManager.prototype.addToneRecord = function (toneRecord, callback) {
+//Handle stone record
+DataManager.prototype.addStoneRecord = function (stoneRecord, callback) {
     var self = this;
-    var createdDate = new Date(toneRecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var createdDate = new Date(stoneRecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO toneRecord (kilnName, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
-            toneRecord.kilnName, toneRecord.name, toneRecord.plateNumber, toneRecord.totalWeight, toneRecord.tareWeight, toneRecord.netWeight, toneRecord.price, toneRecord.cashpaid,toneRecord.wxpaid, toneRecord.unpaid, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO stoneRecord (name, plateNumber,netWeight,type,recordUser,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?)",
+            stoneRecord.name, stoneRecord.plateNumber, stoneRecord.netWeight, stoneRecord.type, stoneRecord.recordUser, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
-                            toneRecord["id"] = this.lastID;
-                            return self.getToneRecord(this.lastID, callback);
+                            stoneRecord["id"] = this.lastID;
+                            return self.getStoneRecord(this.lastID, callback);
                         }
                     }
                     callback(error, null);
@@ -483,17 +457,17 @@ DataManager.prototype.addToneRecord = function (toneRecord, callback) {
     });
 };
 
-DataManager.prototype.updateToneRecord = function (id, toneRecord, callback) {
+DataManager.prototype.updateStoneRecord = function (id, stoneRecord, callback) {
     var self = this;
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE toneRecord SET kilnName = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
-            [toneRecord.kilnName, toneRecord.name, toneRecord.plateNumber, toneRecord.totalWeight, toneRecord.tareWeight, toneRecord.netWeight, toneRecord.price, toneRecord.cashpaid,toneRecord.wxpaid, toneRecord.unpaid, toneRecord.createdDate,
+        db.run("UPDATE stoneRecord SET name = ?, plateNumber = ?, type = ?, netWeight=?, recordUser=?,createdDate=?,modifiedDate=?  WHERE id = ?",
+            [stoneRecord.name, stoneRecord.plateNumber, stoneRecord.type, stoneRecord.netWeight, stoneRecord.recordUser, stoneRecord.createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
-                            return self.getToneRecord(id, callback);
+                            return self.getStoneRecord(id, callback);
                         }
                     }
                     callback(error, null);
@@ -502,39 +476,13 @@ DataManager.prototype.updateToneRecord = function (id, toneRecord, callback) {
     });
 };
 
-DataManager.prototype.getToneRecord = function (id, callback) {
+DataManager.prototype.getStoneRecord = function (id, callback) {
     db.serialize(function () {
-        db.get("SELECT * FROM toneRecord WHERE id= ?", [id], callback);
+        db.get("SELECT * FROM stoneRecord WHERE id= ?", [id], callback);
     });
 };
 
-DataManager.prototype.getToneRecords = function (query, callback) {
-    var self = this;
-    var size = 100;
-    var page = 0;
-    if ("size" in query)
-        size = parseInt(query.size);
-    if ("page" in query)
-        page = parseInt(query.page);
-    var offset = page * size;
-    db.serialize(function () {
-        db.all("SELECT * FROM toneRecord order by modifiedDate desc limit ? offset ?", [size, offset], function (error, result) {
-            if (callback) {
-                self.getToneRecordsCount(NULL, NULL,(err, res) => {
-                    if (!error) {
-                        var data = {};
-                        data["content"] = result;
-                        data["total"] = res.total;
-                        return callback(error, data);
-                    }
-                    callback(error, result);
-                });
-            }
-        });
-    });
-};
-
-DataManager.prototype.searchToneRecords = function (query, callback) {
+DataManager.prototype.searchStoneRecords = function (query, callback) {
     var self = this;
     var size = 100;
     var page = 0;
@@ -546,26 +494,16 @@ DataManager.prototype.searchToneRecords = function (query, callback) {
     var selectedDate = query.date;
     var fromDate = getSearchFromDate(selectedDate);
     var toDate = getSearchToDate(selectedDate);
-    var kilnName = query.kilnName;
     db.serialize(function () {
-        db.all("SELECT * FROM toneRecord WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
+        db.all("SELECT * FROM stonerecord WHERE createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?", [fromDate, toDate, size, offset],  function (error, result) {
             if (callback) {
-                self.getToneRecordsCount(selectedDate, kilnName, (err, res) => {
+                self.getStoneRecordsCount(selectedDate, (err, res) => {
                     if (!error) {
                         var data = {};
                         data["content"] = result;
                         data["total"] = res.total;
-                        var sumWeight = 0;
-                        var sumPrice = 0;
-                        var subItem;
-                        for(var i = 0; i< result.length; i++){
-                            subItem = result[i]; 
-                            sumWeight += subItem.netWeight;
-                            sumPrice += subItem.price;
-                        };
                         var sumContent = {
-                            "sumWeight":sumWeight,
-                            "sumPrice":sumPrice
+                            "sumNetWeight":res.sumNetWeight,
                         };
                         data["sumContent"] = sumContent;
                         return callback(error, data);
@@ -577,7 +515,7 @@ DataManager.prototype.searchToneRecords = function (query, callback) {
     });
 };
 
-DataManager.prototype.getToneRecordsCount = function (date, kilnName, callback) {
+DataManager.prototype.getStoneRecordsCount = function (date, callback) {
     db.serialize(function () {
         var searchString;
         var fromDate;
@@ -585,15 +523,15 @@ DataManager.prototype.getToneRecordsCount = function (date, kilnName, callback) 
         if(date){
             fromDate = getSearchFromDate(date);
             toDate = getSearchToDate(date);
-            searchString = "SELECT count(*) as total FROM toneRecord WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC";
-            db.get(searchString, [kilnName, fromDate, toDate], function (error, result) {
+            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight FROM stonerecord WHERE createdDate BETWEEN ? AND ?";
+            db.get(searchString, [fromDate, toDate], function (error, result) {
                 if (callback) {
                     callback(error, result);
                 }
             });
         }
         else{
-            searchString = "SELECT count(*) as total FROM toneRecord";
+            searchString = "SELECT count(*) as total FROM record";
             db.get(searchString, function (error, result) {
                 if (callback) {
                     callback(error, result);
@@ -601,6 +539,178 @@ DataManager.prototype.getToneRecordsCount = function (date, kilnName, callback) 
             });
         }
         
+    });
+};
+
+//search personStoneRecord
+DataManager.prototype.searchPersonStoneRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    var stoneType = query.type;
+    
+    var searchStr = "SELECT * FROM stonerecord WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+
+    if(stoneType){
+        searchStr += "type = ? AND ";
+        searchData.push(stoneType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getPersonStoneRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                        };
+                        data["sumContent"] = sumContent;
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getPersonStoneRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    var stoneType = query.type;
+
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+
+    if(stoneType){
+        searchStr += "type = ? AND ";
+        searchData.push(stoneType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight FROM stonerecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
+//Search factoryStoneRecord
+DataManager.prototype.searchFactoryStoneRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var stoneType = query.type;
+
+    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight FROM stonerecord WHERE ";
+    var searchData = [];
+    if(stoneType){
+        searchStr += "type = ? AND ";
+        searchData.push(stoneType);
+    }
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate DESC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getFactoryStoneRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                        };
+                        data["sumContent"] = sumContent;
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getFactoryStoneRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var stoneType = query.type;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(stoneType){
+        searchStr += "type = ? AND ";
+        searchData.push(stoneType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight FROM stonerecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
     });
 };
 

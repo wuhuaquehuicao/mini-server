@@ -57,11 +57,8 @@
 
     <div>
       <el-form ref="form" :inline="true" :model="sumContent" :rules="rules" style="margin-top: 40px;">
-          <el-form-item label="总重量" prop="sumWeight11">
-            <el-input v-model="sumContent.sumWeight" auto-complete="off" v-bind:readonly="true"/>
-          </el-form-item>
-          <el-form-item label="总收入" prop="sumPrice">
-            <el-input v-model="sumContent.sumPrice" auto-complete="off" v-bind:readonly="true"/>
+          <el-form-item label="总净量:" prop="sumNetWeight">
+            <el-input v-model="sumContent.sumNetWeight" auto-complete="off" v-bind:readonly="true"/>
           </el-form-item>
       </el-form>
     </div>
@@ -112,33 +109,18 @@ export default {
       this.currentPage = val;
       this.search();
     },
-    getKilns(){
-      request({
-        url: "/kilns",
-        method: "get"
-      })
-        .then(response => {
-          this.kilnsOptions = response;
-          this.loading = false;
-        })
-        .catch(error => {
-          this.loading = false;
-          console.log(error);
-        });
-    },
     edit(id) {
-      this.$router.push({ name: "EditCaoRecord", params: { id: id } });
+      this.$router.push({ name: "EditStoneRecord", params: { id: id } });
     },
     search(){
       var date = this.form.createdDate;
       request({
-        url: "/searchrecords",
+        url: "/searchStoneRecords",
         method: "get",
         params: {
           size: this.pageSize,
           page: this.currentPage - 1,
           date: date,
-          kilnName: this.form.kilnName
         }
       })
         .then(response => {

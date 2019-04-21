@@ -1,25 +1,9 @@
 var app = require("../main/app");
 
 module.exports = {
-    "/toneRecords": {
-        get: function (req, res, next) {
-            this.db.getToneRecords(req.query,
-                function (err, result) {
-                    if (err) {
-                        next(new errors.InternalServerError());
-                    } else {
-                        res.writeHead(200, {
-                            "Content-type": "application/json; charset=UTF-8"
-                        });
-                        res.write(JSON.stringify(result));
-                        res.end();
-                        next();
-                    }
-                }
-            );
-        },
+    "/stoneRecords": {
         post: function (req, res, next) {
-            this.db.addToneRecord(req.body,
+            this.db.addStoneRecord(req.body,
                 function (err, result) {
                     if (err) {
                         next(new errors.InternalServerError());
@@ -36,7 +20,7 @@ module.exports = {
         },
         "/:id": {
             get: function (req, res, next) {
-                this.db.getToneRecord(parseInt(req.params.id),
+                this.db.getStoneRecord(parseInt(req.params.id),
                     function (err, result) {
                         if (err) {
                             next(new errors.InternalServerError());
@@ -52,7 +36,7 @@ module.exports = {
                 );
             },
             put: function (req, res, next) {
-                this.db.updateToneRecord(parseInt(req.params.id), req.body,
+                this.db.updateStoneRecord(parseInt(req.params.id), req.body,
                     function (err, result) {
                         if (err) {
                             next(new errors.InternalServerError());
@@ -69,9 +53,45 @@ module.exports = {
             }
         }
     },
-    "/searchToneRecords": {
+    "/searchStoneRecords": {
         get: function (req, res, next) {
-            this.db.searchToneRecords(req.query,
+            this.db.searchStoneRecords(req.query,
+                function (err, result) {
+                    if (err) {
+                        next(new errors.InternalServerError());
+                    } else {
+                        res.writeHead(200, {
+                            "Content-type": "application/json; charset=UTF-8"
+                        });
+                        res.write(JSON.stringify(result));
+                        res.end();
+                        next();
+                    }
+                }
+            );
+        },
+    },
+    "/searchPersonStoneRecords": {
+        get: function (req, res, next) {
+            this.db.searchPersonStoneRecords(req.query,
+                function (err, result) {
+                    if (err) {
+                        next(new errors.InternalServerError());
+                    } else {
+                        res.writeHead(200, {
+                            "Content-type": "application/json; charset=UTF-8"
+                        });
+                        res.write(JSON.stringify(result));
+                        res.end();
+                        next();
+                    }
+                }
+            );
+        },
+    },
+    "/searchFactoryStoneRecords": {
+        get: function (req, res, next) {
+            this.db.searchFactoryStoneRecords(req.query,
                 function (err, result) {
                     if (err) {
                         next(new errors.InternalServerError());

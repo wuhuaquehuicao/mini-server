@@ -105,30 +105,36 @@ export const constantRouterMap = [
   },
   // 石头记录
   {
-    path: '/tonerecord',
+    path: '/stonerecord',
     component: Layout,
-    redirect: '/tonerecord/list',
-    name: 'ToneRecord',
+    redirect: '/stonerecord/list',
+    name: 'StoneRecord',
     meta: { title: '石头记录', icon: 'example' },
     children: [
       {
         path: 'list',
         name: 'List',
-        component: () => import('@/views/tonerecord/list'),
+        component: () => import('@/views/stonerecord/list'),
         meta: { title: '查看', icon: 'table' }
       },
       {
         path: 'add',
         name: 'Add',
-        component: () => import('@/views/tonerecord/add'),
+        component: () => import('@/views/stonerecord/add'),
         meta: { title: '新增', icon: 'table' }
       },
       {
         path: 'edit/:id',
-        name: 'EditToneRecord',
-        component: () => import('@/views/tonerecord/edit'),
+        name: 'EditStoneRecord',
+        component: () => import('@/views/stonerecord/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
+      },
+      {
+        path: 'statistics',
+        name: 'StatisticsStoneRecord',
+        component: () => import('@/views/stonerecord/statistics'),
+        meta: { title: '统计', icon: 'table' }
       }
     ]
   },
