@@ -1,24 +1,7 @@
 <template>
   <div class="app-container">
-    <div>
-      <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
-        <el-form-item label="" prop="kilnName" >
-          <el-select v-model="form.kilnName" size="small">
-            <el-option v-for="item in kilnsOptions"
-            :key="item.id"
-            :label="item.kilnName"
-            :value="item.kilnName"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="时间" prop="createdDate">
-        <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间">
-        </el-date-picker>
-      </el-form-item>
-
-      </el-form>
+    <div style="margin-bottom: 20px; font-size:16px">
+      <span>更新石头记录：</span>
     </div>
     <el-form ref="form" :inline="true" :model="form" :rules="rules">
       <el-form-item label="姓名" prop="name">
@@ -32,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="车牌" prop="plateNumber">
-        <el-select v-model="form.plateNumber" size="small" clearable>
+        <el-select v-model="form.plateNumber" size="small">
           <el-option v-for="item in plateNOptions"
           :key="item.plateNumber"
           :label="item.plateNumber"
@@ -41,31 +24,37 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="皮重" prop="tareWeight">
-        <el-input v-model="form.tareWeight" auto-complete="off" placeholder="皮重"/>
-      </el-form-item>
-      <el-form-item label="总重" prop="totalWeight">
-        <el-input v-model="form.totalWeight" auto-complete="off" placeholder="总重"/>
-      </el-form-item>
       <el-form-item label="净重" prop="netWeight">
         <el-input v-model="form.netWeight" auto-complete="off" placeholder="净重"/>
       </el-form-item>
-      <el-form-item label="总价" prop="price">
-        <el-input v-model="form.price" auto-complete="off" placeholder="总价"/>
+      <el-form-item label="类型" prop="type">
+        <el-select v-model="form.type" size="small">
+          <el-option v-for="item in stoneTypeOptions"
+          :key="item.type"
+          :label="item.type"
+          :value="item.type"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="现金付款" prop="cashpaid">
-        <el-input v-model="form.cashpaid" auto-complete="off" placeholder="现金付款"/>
+      <el-form-item label="记录人员" prop="recordUser">
+        <el-select v-model="form.recordUser" size="small">
+          <el-option v-for="item in recordUserOptions"
+          :key="item.userName"
+          :label="item.userName"
+          :value="item.userName"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="微信付款" prop="wxpaid">
-        <el-input v-model="form.wxpaid" auto-complete="off" placeholder="微信付款"/>
-      </el-form-item>
-      <el-form-item label="未付款" prop="unpaid">
-        <el-input v-model="form.unpaid" auto-complete="off" placeholder="未付款"/>
+      <el-form-item label="到厂时间" prop="createdDate">
+        <el-date-picker v-model="form.createdDate" type="datetime" placeholder="选择日期时间">
+        </el-date-picker>
       </el-form-item>
     </el-form>
 
     <div>
-      <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
+      <el-form :inline="true" :rules="rules" style="margin-top: 20px;">
         <el-form-item>
         <el-button type="primary" @click="add" v-if="form.id>0">更新</el-button>
         <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
@@ -86,17 +75,25 @@ export default {
       loading: true,
       usersOptions:[],
       plateNOptions:[],
-      kilnsOptions:[
-        {id:1, kilnName:"新窑"},
-        {id:2, kilnName:"老窑"},
+      recordUserOptions:[
+        {userName:"远兰"},
+        {userName:"阿青"},
+        {userName:"旺仔"},
+        {userName:"道纯"},
+        {userName:"学兴"},
+      ],
+      stoneTypeOptions:[
+        {type:"小石"},
+        {type:"大石"},
       ],
       form: {
         id: 0,
         name: "",
         createdDate: new Date(),
         plateNumber: "",
-        tareWeight: "",
-        kilnName:"新窑"
+        netWeight: "",
+        recordUser:"远兰",
+        type:"大石"
       },
       total: 0,
       pageSize: 100,
@@ -110,9 +107,11 @@ export default {
         plateNumber: [
           { required: true, message: "请输入车牌号", trigger: "blur" }
         ],
-        tareWeight: [
-          { required: true, message: "请输入皮重", trigger: "blur" }
-        ]
+        netWeight: [
+          { required: true, message: "请输入净重", trigger: "blur" }
+        ],
+        recordUser: [{ required: true, message: "请选择记录人员", trigger: "blur" }],
+        type: [{ required: true, message: "请选择类型", trigger: "blur" }],
       }
     };
   },
@@ -166,7 +165,7 @@ export default {
               url: "/alldealUsers",
               method: "get",
               params: {
-              type: "石灰"
+              type: "石头"
             }
             })
               .then(response => {
@@ -183,7 +182,7 @@ export default {
       if (id != null && id > 0) {
         this.form.id = id;
         request({
-          url: "/records/" + id,
+          url: "/stoneRecords/" + id,
           method: "get"
         })
           .then(response => {
@@ -204,7 +203,7 @@ export default {
         if (valid) {
           if (self.form.id != null && self.form.id > 0) {
             request({
-              url: "/records/" + self.form.id,
+              url: "/stoneRecords/" + self.form.id,
               method: "put",
               data: self.form
             })
@@ -219,7 +218,7 @@ export default {
               });
           } else {
             request({
-              url: "/records",
+              url: "/stoneRecords",
               method: "post",
               data: self.form
             })

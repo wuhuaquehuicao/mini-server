@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+    <div style="margin-bottom: 20px; font-size:16px">
+      <span>新增石头记录：</span>
+    </div>
+
     <el-form ref="form" :inline="true" :model="form" :rules="rules">
       <el-form-item label="姓名" prop="name">
         <el-select v-model="form.name" size="small" @change="selectedUser">

@@ -442,7 +442,7 @@ DataManager.prototype.addStoneRecord = function (stoneRecord, callback) {
     var createdDate = new Date(stoneRecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO stoneRecord (name, plateNumber,netWeight,type,recordUser,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?)",
+        db.run("INSERT INTO stonerecord (name, plateNumber,netWeight,type,recordUser,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?)",
             stoneRecord.name, stoneRecord.plateNumber, stoneRecord.netWeight, stoneRecord.type, stoneRecord.recordUser, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -461,7 +461,7 @@ DataManager.prototype.updateStoneRecord = function (id, stoneRecord, callback) {
     var self = this;
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE stoneRecord SET name = ?, plateNumber = ?, type = ?, netWeight=?, recordUser=?,createdDate=?,modifiedDate=?  WHERE id = ?",
+        db.run("UPDATE stonerecord SET name = ?, plateNumber = ?, type = ?, netWeight=?, recordUser=?,createdDate=?,modifiedDate=?  WHERE id = ?",
             [stoneRecord.name, stoneRecord.plateNumber, stoneRecord.type, stoneRecord.netWeight, stoneRecord.recordUser, stoneRecord.createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
@@ -478,7 +478,7 @@ DataManager.prototype.updateStoneRecord = function (id, stoneRecord, callback) {
 
 DataManager.prototype.getStoneRecord = function (id, callback) {
     db.serialize(function () {
-        db.get("SELECT * FROM stoneRecord WHERE id= ?", [id], callback);
+        db.get("SELECT * FROM stonerecord WHERE id= ?", [id], callback);
     });
 };
 

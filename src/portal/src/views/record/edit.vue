@@ -1,5 +1,8 @@
 <template>
   <div class="app-container">
+    <div style="margin-bottom: 20px; font-size:16px">
+      <span>更新石灰记录：</span>
+    </div>
     <div>
       <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
         <el-form-item label="" prop="kilnName" >
