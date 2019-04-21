@@ -47,6 +47,7 @@
           <el-button type="primary" @click="edit(scope.row.id)">编辑</el-button>
         </template>
       </el-table-column>
+      <el-table-column prop="note" label="备注"/>
     </el-table>
     <el-pagination
       :current-page="0"
