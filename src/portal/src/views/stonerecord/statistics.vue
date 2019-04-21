@@ -66,9 +66,9 @@
             <el-table-column prop="type" label="石头类型" width="80"/>
             <el-table-column prop="netWeight" label="净重" width="80"/>
             <el-table-column prop="recordUser" label="记录人员" width="80"/>
-            <el-table-column prop="createdDate" label="入厂时间">
+            <el-table-column prop="createdDate" label="入厂时间" width="160">
             </el-table-column>
-            <el-table-column prop="modifiedDate" label="修改时间"/>
+            <el-table-column prop="modifiedDate" label="修改时间" width="160"/>
             <el-table-column label="操作" width="80">
                 <template slot-scope="scope">
                 <!-- <el-button @click="$router.push({ name: 'Detail', params: {id: scope.row.id} })">详情</el-button> -->
