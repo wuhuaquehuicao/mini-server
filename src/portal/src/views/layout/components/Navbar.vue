@@ -4,7 +4,6 @@
     <breadcrumb />
     <el-dropdown class="avatar-container">
       <div class="avatar-wrapper">
-        <span>{{ $store.getters.name }}</span>
         <img src="@/assets/logo/logo.png" class="user-avatar">
         <i class="el-icon-caret-bottom"/>
       </div>
