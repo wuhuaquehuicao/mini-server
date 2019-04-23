@@ -14,12 +14,14 @@
             </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="电话" prop="phone">
-        <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
-      </el-form-item>
       <el-form-item label="车牌" prop="plateNumber">
         <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用逗号分开)"/>
       </el-form-item>
+
+      <el-form-item label="电话" prop="phone">
+        <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
+      </el-form-item>
+  
       <el-form-item label="地址" prop="address">
         <el-input v-model="form.address" auto-complete="off" placeholder="地址"/>
       </el-form-item>
@@ -71,12 +73,6 @@ export default {
         plateNumber: [
           { required: true, message: "请输入车牌", trigger: "blur" }
         ],
-        phone: [
-          { required: true, message: "请输入电话号码", trigger: "blur"}
-        ],
-        address: [
-          { required: true, message: "请输入地址", trigger: "blur" }
-        ]
       }
     };
   },
@@ -121,10 +117,19 @@ export default {
               data: self.form
             })
               .then(response => {
-                this.$message({
+                var errorMsg = response.error;
+                if(errorMsg){
+                  this.$message({
+                  message: errorMsg,
+                  type: "failed"
+                });
+                }
+                else{
+                  this.$message({
                   message: "更新成功",
                   type: "success"
                 });
+                }
               })
               .catch(error => {
                 console.log(error);
@@ -136,16 +141,25 @@ export default {
               data: self.form
             })
               .then(response => {
-                this.form = {
+                var errorMsg = response.error;
+                if(errorMsg){
+                  this.$message({
+                  message: errorMsg,
+                  type: "failed"
+                });
+                }
+                else{
+                  this.form = {
                     id: 0,
                     name: "",
                     phone: "",
                     plateNumber:""
-                };
-                this.$message({
+                   };
+                  this.$message({
                   message: "添加成功",
                   type: "success"
                 });
+                }
               })
               .catch(error => {
                 console.log(error);

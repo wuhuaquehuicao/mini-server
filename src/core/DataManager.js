@@ -1032,7 +1032,12 @@ DataManager.prototype.addDealUser = function (dealUser, callback) {
     var self = this;
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss"); 
     db.serialize(function () {
-        db.run("INSERT INTO dealUser (name, type,phone, plateNumber,address,modifiedDate) VALUES (?,?,?,?,?,?)",
+        db.get("SELECT * FROM dealUser WHERE name= ?", [dealUser.name], function (error, result){
+            if(result){
+                callback(null, {error:"已经存在该用户，请用其他名字。"})
+            }
+            else{
+                db.run("INSERT INTO dealUser (name, type,phone, plateNumber,address,modifiedDate) VALUES (?,?,?,?,?,?)",
             dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -1044,6 +1049,8 @@ DataManager.prototype.addDealUser = function (dealUser, callback) {
                     callback(error, null);
                 }
             });
+            }
+        });  
     });
 };
 
@@ -1051,7 +1058,12 @@ DataManager.prototype.updateDealUser = function (id, dealUser, callback) {
     var self = this;
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss"); 
     db.serialize(function () {
-        db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ?, modifiedDate = ? WHERE id = ?",
+        db.get("SELECT * FROM dealUser WHERE name= ?", [dealUser.name], function (error, result){
+            if(result && result.id != id){
+                callback(null, {error:"已经存在该用户，请用其他名字。"})
+            }
+            else{
+                db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, address = ?, modifiedDate = ? WHERE id = ?",
             [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.address, modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -1062,6 +1074,24 @@ DataManager.prototype.updateDealUser = function (id, dealUser, callback) {
                     callback(error, null);
                 }
             });
+            }
+        });   
+    });
+};
+
+DataManager.prototype.deleteDealUser = function (id, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.get("DELETE FROM dealUser WHERE id= ?", [id], function (error, result){
+            if (callback) {
+                if (!error) {
+                    if (this.changes == 1) {
+                        return self.getDealUser(id, callback);
+                    }
+                }
+                callback(error, null);
+            }
+        });   
     });
 };
 

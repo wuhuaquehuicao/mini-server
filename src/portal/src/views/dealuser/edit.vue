@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
       <el-form-item label="姓名" prop="name">
-        <el-input v-model="form.name" placeholder="姓名"/>
+        <el-input v-model="form.name" placeholder="姓名" v-bind:readonly="true"/>
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="form.type" size="small">
@@ -14,12 +14,14 @@
             </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="电话" prop="phone">
-        <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
-      </el-form-item>
       <el-form-item label="车牌" prop="plateNumber">
         <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用逗号分开)"/>
       </el-form-item>
+      
+      <el-form-item label="电话" prop="phone">
+        <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
+      </el-form-item>
+      
       <el-form-item label="地址" prop="address">
         <el-input v-model="form.address" auto-complete="off" placeholder="地址"/>
       </el-form-item>
@@ -28,7 +30,11 @@
         <el-form :rules="rules" style="margin-top: 20px;">
           <el-form-item>
           <el-button type="primary" @click="add" v-if="form.id>0">更新</el-button>
-          <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
+        </el-form-item>
+        </el-form>
+        <el-form :rules="rules" style="margin-top: 20px;">
+          <el-form-item>
+          <el-button type="primary" @click="deleteUser" v-if="form.id>0">删除</el-button>
         </el-form-item>
         </el-form>
       </div>
@@ -70,12 +76,6 @@ export default {
         plateNumber: [
           { required: true, message: "请输入车牌", trigger: "blur" }
         ],
-        phone: [
-          { required: true, message: "请输入电话号码", trigger: "blur"}
-        ],
-        address: [
-          { required: true, message: "请输入地址", trigger: "blur" }
-        ]
       }
     };
   },
@@ -109,6 +109,39 @@ export default {
         this.form.id = 0;
       }
     },
+    deleteUser(){
+      var self = this;
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          if (self.form.id != null && self.form.id > 0) {
+            request({
+              url: "/dealUsers/" + self.form.id,
+              method: "post",
+              data: self.form
+            })
+              .then(response => {
+                this.form = {
+                    id: 0,
+                    name: "",
+                    phone: "",
+                    plateNumber:""
+                   };
+                  this.$message({
+                  message: "删除成功",
+                  type: "success"
+                });
+                
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          } 
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
     add() {
       var self = this;
       this.$refs.form.validate(valid => {
@@ -120,10 +153,20 @@ export default {
               data: self.form
             })
               .then(response => {
-                this.$message({
+                var errorMsg = response.error;
+                if(errorMsg){
+                  this.$message({
+                  message: errorMsg,
+                  type: "failed"
+                });
+                }
+                else{
+                  this.$message({
                   message: "更新成功",
                   type: "success"
                 });
+                }
+                
               })
               .catch(error => {
                 console.log(error);

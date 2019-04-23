@@ -84,7 +84,23 @@ module.exports = {
                         }
                     }
                 );
-            }
+            },
+            post: function (req, res, next) {
+                this.db.deleteDealUser(parseInt(req.params.id),
+                    function (err, result) {
+                        if (err) {
+                            next(new errors.InternalServerError());
+                        } else {
+                            res.writeHead(200, {
+                                "Content-type": "application/json; charset=UTF-8"
+                            });
+                            res.write(JSON.stringify(result));
+                            res.end();
+                            next();
+                        }
+                    }
+                );
+            }, 
         },
     }
 };
