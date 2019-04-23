@@ -17,7 +17,7 @@
       <el-form-item label="车牌" prop="plateNumber">
         <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用逗号分开)"/>
       </el-form-item>
-      
+
       <el-form-item label="电话" prop="phone">
         <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
       </el-form-item>
@@ -110,37 +110,40 @@ export default {
       }
     },
     deleteUser(){
-      var self = this;
-      this.$refs.form.validate(valid => {
-        if (valid) {
-          if (self.form.id != null && self.form.id > 0) {
-            request({
-              url: "/dealUsers/" + self.form.id,
-              method: "post",
-              data: self.form
-            })
-              .then(response => {
-                this.form = {
-                    id: 0,
-                    name: "",
-                    phone: "",
-                    plateNumber:""
-                   };
-                  this.$message({
-                  message: "删除成功",
-                  type: "success"
-                });
-                
+      this.$confirm('你确定要删除该用户资料吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var self = this;
+          this.$refs.form.validate(valid => {
+          if (valid) {
+            if (self.form.id != null && self.form.id > 0) {
+              request({
+                url: "/dealUsers/" + self.form.id,
+                method: "post",
+                data: self.form
               })
-              .catch(error => {
-                console.log(error);
-              });
-          } 
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+                .then(response => {
+                  this.form = {
+                      id: 0,
+                      name: "",
+                      phone: "",
+                      plateNumber:""
+                    };
+                    this.$message({
+                    message: "删除成功",
+                    type: "success"
+                  });
+                  
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+            }
+          }});
+        }).catch(() => {       
+        });
     },
     add() {
       var self = this;
