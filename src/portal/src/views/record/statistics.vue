@@ -67,6 +67,7 @@
             <el-table-column prop="totalWeight" label="总重" width="80"/>
             <el-table-column prop="tareWeight" label="皮重" width="80"/>
             <el-table-column prop="netWeight" label="净重" width="80"/>
+            <el-table-column prop="ashWeight" label="灰粉" width="150"/>
             <el-table-column prop="price" label="总价" width="80"/>
             <el-table-column prop="cashpaid" label="现金支付" width="80"/>
             <el-table-column prop="wxpaid" label="微信支付" width="80"/>
@@ -109,6 +110,7 @@
             border
             >
             <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+            <el-table-column prop="sumAshWeight" label="灰粉" width="120"/>
             <el-table-column prop="sumPrice" label="总收入" width="120"/>
             <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
             <el-table-column prop="sumWxpaid" label="微信支付" width="120"/>
@@ -167,6 +169,7 @@
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
             <el-table-column prop="netWeight" label="净重" width="150"/>
+            <el-table-column prop="ashWeight" label="灰粉" width="150"/>
             <el-table-column prop="price" label="总价" width="150"/>
             <el-table-column prop="cashpaid" label="现金支付" width="150"/>
             <el-table-column prop="wxpaid" label="微信支付" width="150"/>
@@ -198,6 +201,7 @@
                     border
                     >
                     <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+                    <el-table-column prop="sumAshWeight" label="灰粉" width="120"/>
                     <el-table-column prop="sumPrice" label="总收入" width="120"/>
                     <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
                     <el-table-column prop="sumWxpaid" label="微信支付" width="120"/>

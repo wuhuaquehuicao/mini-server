@@ -52,7 +52,7 @@ function DataManager() {
         db.run("CREATE TABLE IF NOT EXISTS dealUser (id INTEGER primary key, name TEXT, plateNumber TEXT, phone TEXT, address TEXT, type TEXT, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT,type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS stonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
-        db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
 
@@ -163,8 +163,8 @@ DataManager.prototype.addRecord = function (record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO record (kilnName, type, name, plateNumber,totalWeight,tareWeight,netWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            record.kilnName, record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO record (kilnName, type, name, plateNumber,totalWeight,tareWeight,netWeight,ashWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            record.kilnName, record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.ashWeight,record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -181,10 +181,11 @@ DataManager.prototype.addRecord = function (record, callback) {
 
 DataManager.prototype.updateRecord = function (id, record, callback) {
     var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss")
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE record SET kilnName = ?, type = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
-            [record.kilnName,record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, record.createdDate,
+        db.run("UPDATE record SET kilnName = ?, type = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?, ashWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.kilnName,record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.ashWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -227,6 +228,7 @@ DataManager.prototype.searchRecords = function (query, callback) {
                         data["total"] = res.total;
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
+                            "sumAshWeight":res.sumAshWeight,
                             "sumPrice":res.sumPrice,
                             "sumCashpaid":res.sumCashpaid,
                             "sumWxpaid":res.sumWxpaid,
@@ -250,7 +252,7 @@ DataManager.prototype.getRecordsCount = function (date, kilnName, callback) {
         if(date){
             fromDate = getSearchFromDate(date);
             toDate = getSearchToDate(date);
-            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC";
+            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight , SUM(ashWeight) AS sumAshWeight, SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by modifiedDate DESC";
             db.get(searchString, [kilnName, fromDate, toDate], function (error, result) {
                 if (callback) {
                     callback(error, result);
@@ -317,6 +319,7 @@ DataManager.prototype.searchPersonRecords = function (query, callback) {
                         data["total"] = res.total;
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
+                            "sumAshWeight":res.sumAshWeight,
                             "sumPrice":res.sumPrice,
                             "sumCashpaid":res.sumCashpaid,
                             "sumWxpaid":res.sumWxpaid,
@@ -362,7 +365,7 @@ DataManager.prototype.getPersonRecordsCount = function (query, callback) {
 
     db.serialize(function () {
         var searchString;
-        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(ashWeight) AS sumAshWeight, SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
             db.get(searchString, searchData, function (error, result) {
                 if (callback) {
                     callback(error, result);
@@ -385,7 +388,7 @@ DataManager.prototype.searchFactoryRecords = function (query, callback) {
     var toDate = getSearchToDate(query.toDate);
     var kilnName = query.kilnName;
     
-    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(cashpaid) AS cashpaid ,SUM(wxpaid) AS wxpaid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM record WHERE ";
+    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(ashWeight) AS sumAshWeight,SUM(cashpaid) AS cashpaid ,SUM(wxpaid) AS wxpaid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM record WHERE ";
     var searchData = [];
     if(kilnName){
         searchStr += "kilnName = ? AND ";
@@ -413,6 +416,7 @@ DataManager.prototype.searchFactoryRecords = function (query, callback) {
                         data["total"] = 2;//res.total;
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
+                            "sumAshWeight":res.sumAshWeight,
                             "sumPrice":res.sumPrice,
                             "sumCashpaid":res.sumCashpaid,
                             "sumWxpaid":res.sumWxpaid,
@@ -452,7 +456,7 @@ DataManager.prototype.getFactoryRecordsCount = function (query, callback) {
 
     db.serialize(function () {
         var searchString;
-        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight ,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
+        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight ,SUM(ashWeight) AS sumAshWeight,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM record " + searchStr;
             db.get(searchString, searchData, function (error, result) {
                 if (callback) {
                     callback(error, result);
@@ -484,10 +488,11 @@ DataManager.prototype.addStoneRecord = function (stoneRecord, callback) {
 
 DataManager.prototype.updateStoneRecord = function (id, stoneRecord, callback) {
     var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
         db.run("UPDATE stonerecord SET name = ?, plateNumber = ?, type = ?, netWeight=?, recordUser=?,createdDate=?,modifiedDate=?  WHERE id = ?",
-            [stoneRecord.name, stoneRecord.plateNumber, stoneRecord.type, stoneRecord.netWeight, stoneRecord.recordUser, stoneRecord.createdDate,
+            [stoneRecord.name, stoneRecord.plateNumber, stoneRecord.type, stoneRecord.netWeight, stoneRecord.recordUser, createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -763,10 +768,11 @@ DataManager.prototype.addCoalRecord = function (record, callback) {
 
 DataManager.prototype.updateCoalRecord = function (id, record, callback) {
     var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
         db.run("UPDATE coalrecord SET name = ?, plateNumber = ?, type = ?, totalWeight = ?, tareWeight= ?,netWeight=?,price=?,paid=?,unpaid=?, createdDate=?,modifiedDate=? ,note=? WHERE id = ?",
-            [record.name, record.plateNumber, record.type, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, record.createdDate,
+            [record.name, record.plateNumber, record.type, record.totalWeight, record.tareWeight, record.netWeight, record.price, record.paid, record.unpaid, createdDate,
             modifiedDate, record.note, id], function (error, result) {
                 if (callback) {
                     if (!error) {
