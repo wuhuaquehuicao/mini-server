@@ -73,9 +73,6 @@ export default {
       rules: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
         type: [{ required: true, message: "请选择类型", trigger: "blur" }],
-        plateNumber: [
-          { required: true, message: "请输入车牌", trigger: "blur" }
-        ],
       }
     };
   },
@@ -126,10 +123,6 @@ export default {
               })
                 .then(response => {
                   this.form = {
-                      id: 0,
-                      name: "",
-                      phone: "",
-                      plateNumber:""
                     };
                     this.$message({
                     message: "删除成功",

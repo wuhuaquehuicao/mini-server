@@ -36,7 +36,23 @@ module.exports = {
                 );
             },
             put: function (req, res, next) {
-                this.db.updateRecord(parseInt(req.params.id), req.body,
+                this.db.updateRecord(parseInt(req.params.id),
+                    function (err, result) {
+                        if (err) {
+                            next(new errors.InternalServerError());
+                        } else {
+                            res.writeHead(200, {
+                                "Content-type": "application/json; charset=UTF-8"
+                            });
+                            res.write(JSON.stringify(result));
+                            res.end();
+                            next();
+                        }
+                    }
+                );
+            },
+            post: function (req, res, next) {
+                this.db.deleteRecord(parseInt(req.params.id),
                     function (err, result) {
                         if (err) {
                             next(new errors.InternalServerError());

@@ -128,12 +128,6 @@ export default {
       rules: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
         createdDate: [{ required: true, message: "请输入时间", trigger: "blur" }],
-        plateNumber: [
-          { required: true, message: "请输入车牌号", trigger: "blur" }
-        ],
-        tareWeight: [
-          { required: true, message: "请输入皮重", trigger: "blur" }
-        ],
         type: [
           { required: true, message: "请选择灰类", trigger: "blur" }
         ]

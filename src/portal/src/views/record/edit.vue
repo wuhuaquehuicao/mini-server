@@ -65,7 +65,7 @@
         <el-input v-model="form.netWeight" auto-complete="off" placeholder="净重"/>
       </el-form-item>
       <el-form-item label="灰粉" prop="ashWieght">
-        <el-input v-model="form.ashWieght" auto-complete="off" placeholder="类粉净重"/>
+        <el-input v-model="form.ashWieght" auto-complete="off" placeholder="灰粉净重"/>
       </el-form-item>
       <el-form-item label="总价" prop="price">
         <el-input v-model="form.price" auto-complete="off" placeholder="总价"/>
@@ -87,6 +87,11 @@
         <el-button type="primary" @click="add" v-if="form.id>0">更新</el-button>
         <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
       </el-form-item>
+      <el-form :rules="rules" style="margin-top: 20px;">
+          <el-form-item>
+          <el-button type="primary" @click="deleteRecord" v-if="form.id>0">删除</el-button>
+        </el-form-item>
+        </el-form>
       </el-form>
     </div>
   </div>
@@ -129,12 +134,6 @@ export default {
       rules: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
         createdDate: [{ required: true, message: "请输入时间", trigger: "blur" }],
-        plateNumber: [
-          { required: true, message: "请输入车牌号", trigger: "blur" }
-        ],
-        tareWeight: [
-          { required: true, message: "请输入皮重", trigger: "blur" }
-        ],
         type: [
           { required: true, message: "请选择灰类", trigger: "blur" }
         ]
@@ -222,6 +221,38 @@ export default {
       } else {
         this.form.id = 0;
       }
+    },
+    deleteRecord(){
+      this.$confirm('你确定要删除该石灰记录吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var self = this;
+          this.$refs.form.validate(valid => {
+          if (valid) {
+            if (self.form.id != null && self.form.id > 0) {
+              request({
+                url: "/records/" + self.form.id,
+                method: "post",
+                data: self.form
+              })
+                .then(response => {
+                  // this.form = {
+                  //   };
+                    this.$message({
+                    message: "删除成功",
+                    type: "success"
+                  });
+                  
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+            }
+          }});
+        }).catch(() => {       
+        });
     },
     add() {
       var self = this;

@@ -199,6 +199,20 @@ DataManager.prototype.updateRecord = function (id, record, callback) {
     });
 };
 
+DataManager.prototype.deleteRecord = function (id, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.get("DELETE FROM record WHERE id= ?", [id], function (error, result){
+            if (callback) {
+                if (!error) {
+                    return self.getDealUser(id, callback);
+                }
+                callback(error, null);
+            }
+        });   
+    });
+};
+
 DataManager.prototype.getRecord = function (id, callback) {
     db.serialize(function () {
         db.get("SELECT * FROM record WHERE id= ?", [id], callback);
@@ -1091,9 +1105,7 @@ DataManager.prototype.deleteDealUser = function (id, callback) {
         db.get("DELETE FROM dealUser WHERE id= ?", [id], function (error, result){
             if (callback) {
                 if (!error) {
-                    if (this.changes == 1) {
-                        return self.getDealUser(id, callback);
-                    }
+                    return self.getDealUser(id, callback);
                 }
                 callback(error, null);
             }
