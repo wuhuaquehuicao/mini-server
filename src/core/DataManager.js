@@ -205,7 +205,7 @@ DataManager.prototype.deleteRecord = function (id, callback) {
         db.get("DELETE FROM record WHERE id= ?", [id], function (error, result){
             if (callback) {
                 if (!error) {
-                    return self.getDealUser(id, callback);
+                    return callback(null, {});;
                 }
                 callback(error, null);
             }
@@ -1105,7 +1105,7 @@ DataManager.prototype.deleteDealUser = function (id, callback) {
         db.get("DELETE FROM dealUser WHERE id= ?", [id], function (error, result){
             if (callback) {
                 if (!error) {
-                    return self.getDealUser(id, callback);
+                    return callback(null,{});
                 }
                 callback(error, null);
             }

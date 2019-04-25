@@ -238,8 +238,8 @@ export default {
                 data: self.form
               })
                 .then(response => {
-                  // this.form = {
-                  //   };
+                  this.form = {
+                    };
                     this.$message({
                     message: "删除成功",
                     type: "success"
