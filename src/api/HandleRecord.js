@@ -36,7 +36,7 @@ module.exports = {
                 );
             },
             put: function (req, res, next) {
-                this.db.updateRecord(parseInt(req.params.id),
+                this.db.updateRecord(parseInt(req.params.id), req.body,
                     function (err, result) {
                         if (err) {
                             next(new errors.InternalServerError());

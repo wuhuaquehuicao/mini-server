@@ -205,7 +205,7 @@ DataManager.prototype.deleteRecord = function (id, callback) {
         db.get("DELETE FROM record WHERE id= ?", [id], function (error, result){
             if (callback) {
                 if (!error) {
-                    return callback(null, {});;
+                    return callback(null, {});
                 }
                 callback(error, null);
             }

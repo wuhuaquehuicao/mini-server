@@ -242,13 +242,19 @@ export default {
               data: self.form
             })
               .then(response => {
-                this.form = {
-                    id: 0,
-                    createdDate: new Date(),
-                    kilnName:"新窑",
-                    plateNumber:"",
-                    type:"零灰"
-                };
+                this.form.id = 0;
+                this.form.createdDate = new Date();
+                this.form.name = "";
+                this.form.plateNumber = "";
+                this.form.tareWeight = "";
+                this.form.totalWeight = "";
+                this.form.netWeight = "";
+                this.form.price = "";
+                this.form.cashpaid = "";
+                this.form.wxpaid = "";
+                this.form.unpaid = "";
+                this.form.ashWieght = "";
+
                 this.loading = false;
                 this.$message({
                   message: "添加成功",
