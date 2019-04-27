@@ -502,7 +502,7 @@ DataManager.prototype.addStoneRecord = function (stoneRecord, callback) {
 
 DataManager.prototype.updateStoneRecord = function (id, stoneRecord, callback) {
     var self = this;
-    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var createdDate = new Date(stoneRecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
         db.run("UPDATE stonerecord SET name = ?, plateNumber = ?, type = ?, netWeight=?, recordUser=?,createdDate=?,modifiedDate=?  WHERE id = ?",
