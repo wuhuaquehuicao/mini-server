@@ -95,9 +95,20 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('Login', this.loginForm).then(() => {
+          this.$store.dispatch('Login', this.loginForm).then(response => {
             this.loading = false
-            this.$router.push({ path: this.redirect || '/' })
+            var notFoundUser = response.message;
+            this.$message({
+                    message: "d",
+                    type: "failed"
+                  });
+            if(notFoundUser){
+              this.$message({
+                    message: notFoundUser,
+                    type: "failed"
+                  });
+            }else
+              this.$router.push({ path: this.redirect || '/' })
           }).catch(() => {
             this.loading = false
           })

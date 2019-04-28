@@ -45,7 +45,8 @@ const user = {
           commit('SET_TOKEN', response.token)
           commit('SET_USERID', response.id)
           commit('SET_ROLES', response.roles)
-          resolve()
+          
+          resolve(response)
         }).catch(error => {
           reject(error)
         })

@@ -129,6 +129,9 @@ DataManager.prototype.login = function (user, callback) {
                             role: "admin"
                         });
                     }
+                    else{
+                        return callback(error, {message:"请输入正确的账号或密码"})
+                    }
                 }
                 callback(error, result);
             }
