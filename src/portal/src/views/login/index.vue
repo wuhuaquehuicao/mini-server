@@ -98,10 +98,6 @@ export default {
           this.$store.dispatch('Login', this.loginForm).then(response => {
             this.loading = false
             var notFoundUser = response.message;
-            this.$message({
-                    message: "d",
-                    type: "failed"
-                  });
             if(notFoundUser){
               this.$message({
                     message: notFoundUser,
