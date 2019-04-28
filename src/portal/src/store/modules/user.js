@@ -1,12 +1,12 @@
-import { getToken, setToken, removeToken, getUserId, setUserId, removeUserId } from '@/utils/auth'
+import { getToken, setToken, removeToken, getUserId, setUserId, removeUserId, getRoles, setRoles, removeRoles } from '@/utils/auth'
 import request from "@/utils/request";
 
 const user = {
   state: {
     token: getToken(),
     userId: getUserId(),
-    name: '',
-    roles: []
+    roles: getRoles(),
+    name: ''
   },
 
   mutations: {
@@ -41,8 +41,10 @@ const user = {
           // 存储token，id
           setToken(response.token)
           setUserId(response.id);
+          setRoles(response.roles);
           commit('SET_TOKEN', response.token)
           commit('SET_USERID', response.id)
+          commit('SET_ROLES', response.roles)
           resolve()
         }).catch(error => {
           reject(error)
@@ -57,7 +59,7 @@ const user = {
           method: 'get'
         }).then(response => {
           commit('SET_NAME', response.name)
-          // commit('SET_ROLES', response.roles)     // 用户权限
+          commit('SET_ROLES', response.roles)     // 用户权限
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -93,6 +95,7 @@ const user = {
         // 清除token,userid
         removeToken()
         removeUserId();
+        removeRoles();
         resolve()
       })
     },
