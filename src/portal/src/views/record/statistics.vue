@@ -6,7 +6,8 @@
             <div>
             <el-form ref="personForm" :inline="true" :model="personForm" :rules="rules" style="margin-top: 20px;">
                 <el-form-item label="时间" prop="searchDate">
-                <el-date-picker v-model="personForm.searchDate" type="daterange" placeholder="选择日期" :clearable = "false">
+                <el-date-picker v-model="personForm.searchDate" type="daterange" placeholder="选择日期" :clearable = "false" start-placeholder="开始日期"
+                end-placeholder="结束日期" unlink-panels>
                 </el-date-picker>
             </el-form-item>
 
@@ -109,7 +110,11 @@
             stripe
             border
             >
-            <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+            <el-table-column prop="sumNetWeight" label="总净重" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumNetWeight | rounding}}</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="sumAshWeight" label="灰粉" width="120"/>
             <el-table-column prop="sumPrice" label="总收入" width="120"/>
             <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
@@ -200,7 +205,11 @@
                     stripe
                     border
                     >
-                    <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+                    <el-table-column prop="sumNetWeight" label="总净重" width="120">
+                      <template slot-scope="scope">
+                      <span>{{scope.row.sumNetWeight | rounding}}</span>
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="sumAshWeight" label="灰粉" width="120"/>
                     <el-table-column prop="sumPrice" label="总收入" width="120"/>
                     <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
@@ -265,6 +274,11 @@ export default {
   },
   mounted() {
       this.getDealUsers();
+  },
+  filters :{
+    rounding (value) {
+      return value.toFixed(2);
+    }
   },
   methods: {
     personCurrentChange(val) {
