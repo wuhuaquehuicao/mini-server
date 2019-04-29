@@ -104,6 +104,11 @@ export default {
   },
   mounted() {
   },
+  filters :{
+    rounding (value) {
+      return value.toFixed(2);
+    }
+  },
   methods: {
     currentChange(val) {
       this.currentPage = val;
