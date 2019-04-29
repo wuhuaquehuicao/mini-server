@@ -6,7 +6,7 @@
             <div>
             <el-form ref="personForm" :inline="true" :model="personForm" :rules="rules" style="margin-top: 20px;">
                 <el-form-item label="时间" prop="searchDate">
-                <el-date-picker v-model="personForm.searchDate" type="daterange" placeholder="选择日期" :clearable = "false">
+                <el-date-picker v-model="personForm.searchDate" type="daterange" placeholder="选择日期" :clearable = "false" unlink-panels>
                 </el-date-picker>
             </el-form-item>
 
@@ -100,7 +100,7 @@
             <div>
             <el-form ref="factoryForm" :inline="true" :model="factoryForm" :rules="rules" style="margin-top: 20px;">
                 <el-form-item label="时间" prop="searchDate">
-                <el-date-picker v-model="factoryForm.searchDate" type="daterange" placeholder="选择日期" >
+                <el-date-picker v-model="factoryForm.searchDate" type="daterange" placeholder="选择日期" unlink-panels>
                 </el-date-picker>
             </el-form-item>
 
