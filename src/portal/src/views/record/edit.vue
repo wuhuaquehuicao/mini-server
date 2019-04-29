@@ -87,7 +87,7 @@
         <el-button type="primary" @click="add" v-if="form.id>0">更新</el-button>
         <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
       </el-form-item>
-      <el-form :rules="rules" style="margin-top: 20px;">
+      <el-form  style="margin-top: 20px;">
           <el-form-item>
           <el-button type="primary" @click="deleteRecord" v-if="(form.id>0&&this.$store.getters.roles == 0)">删除</el-button>
         </el-form-item>

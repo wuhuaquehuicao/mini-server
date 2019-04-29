@@ -529,6 +529,20 @@ DataManager.prototype.getStoneRecord = function (id, callback) {
     });
 };
 
+DataManager.prototype.deleteStoneRecord = function (id, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.get("DELETE FROM stonerecord WHERE id= ?", [id], function (error, result){
+            if (callback) {
+                if (!error) {
+                    return callback(null, {});
+                }
+                callback(error, null);
+            }
+        });   
+    });
+};
+
 DataManager.prototype.searchStoneRecords = function (query, callback) {
     var self = this;
     var size = 100;
@@ -806,6 +820,20 @@ DataManager.prototype.updateCoalRecord = function (id, record, callback) {
 DataManager.prototype.getCoalRecord = function (id, callback) {
     db.serialize(function () {
         db.get("SELECT * FROM coalrecord WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.deleteCoalRecord = function (id, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.get("DELETE FROM coalrecord WHERE id= ?", [id], function (error, result){
+            if (callback) {
+                if (!error) {
+                    return callback(null, {});
+                }
+                callback(error, null);
+            }
+        });   
     });
 };
 

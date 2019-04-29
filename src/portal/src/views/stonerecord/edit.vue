@@ -60,6 +60,12 @@
         <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
       </el-form-item>
       </el-form>
+      <el-form  style="margin-top: 20px;">
+          <el-form-item>
+          <el-button type="primary" @click="deleteStoneRecord" v-if="(form.id>0&&this.$store.getters.roles == 0)">删除</el-button>
+        </el-form-item>
+        </el-form>
+      </el-form>
     </div>
   </div>
 </template>
@@ -196,6 +202,38 @@ export default {
       } else {
         this.form.id = 0;
       }
+    },
+    deleteStoneRecord(){
+      this.$confirm('你确定要删除该石头记录吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var self = this;
+          this.$refs.form.validate(valid => {
+          if (valid) {
+            if (self.form.id != null && self.form.id > 0) {
+              request({
+                url: "/stoneRecords/" + self.form.id,
+                method: "post",
+                data: self.form
+              })
+                .then(response => {
+                  this.form = {
+                    };
+                    this.$message({
+                    message: "删除成功",
+                    type: "success"
+                  });
+                  
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+            }
+          }});
+        }).catch(() => {       
+        });
     },
     add() {
       var self = this;
