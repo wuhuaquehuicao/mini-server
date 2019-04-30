@@ -52,6 +52,11 @@
         <el-button type="primary" @click="add" v-if="form.id==0">添加</el-button>
       </el-form-item>
       </el-form>
+      <el-form :rules="rules" style="margin-top: 20px;">
+          <el-form-item>
+          <el-button type="primary" @click="deleteBuildRecord" v-if="(form.id>0&&this.$store.getters.roles == 0)">删除</el-button>
+        </el-form-item>
+        </el-form>
     </div>
   </div>
 </template>
@@ -117,6 +122,38 @@ export default {
       } else {
         this.form.id = 0;
       }
+    },
+    deleteBuildRecord(){
+      this.$confirm('你确定要删除该加窑数据吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          var self = this;
+          this.$refs.form.validate(valid => {
+          if (valid) {
+            if (self.form.id != null && self.form.id > 0) {
+              request({
+                url: "/buildrecord/" + self.form.id,
+                method: "post",
+                data: self.form
+              })
+                .then(response => {
+                  this.form = {
+                    };
+                    this.$message({
+                    message: "删除成功",
+                    type: "success"
+                  });
+                  
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+            }
+          }});
+        }).catch(() => {       
+        });
     },
     add() {
       var self = this;
