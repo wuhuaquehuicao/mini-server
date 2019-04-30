@@ -173,6 +173,41 @@ export const constantRouterMap = [
       }
     ]
   },
+  // 加窑记录
+  {
+    path: '/buildrecord',
+    component: Layout,
+    redirect: '/buildrecord/list',
+    name: 'BuildRecord',
+    meta: { title: '加窑记录', icon: 'example' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/buildrecord/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'Add',
+        component: () => import('@/views/buildrecord/add'),
+        meta: { title: '新增', icon: 'table' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'EditBuildRecord',
+        component: () => import('@/views/buildrecord/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: 'statistics',
+        name: 'StatisticsBuildRecord',
+        component: () => import('@/views/buildrecord/statistics'),
+        meta: { title: '统计', icon: 'table' }
+      }
+    ]
+  },
   // 个人中心
   {
     path: '/user',

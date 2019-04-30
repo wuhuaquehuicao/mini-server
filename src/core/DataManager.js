@@ -1223,6 +1223,210 @@ DataManager.prototype.getKilns = function (query, callback) {
     });
 };
 
+//Handle buildrecord
+DataManager.prototype.addBuildRecord = function (buildrecord, callback) {
+    var self = this;
+    var createdDate = new Date(buildrecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("INSERT INTO buildrecord (kilnName,buildIndex,coalWeight,preRatio,preStoneWeight,reaRatio,reaStoneWeight,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?)",
+            buildrecord.kilnName, buildrecord.buildIndex, buildrecord.coalWeight, buildrecord.preRatio, buildrecord.preStoneWeight, buildrecord.reaRatio, buildrecord.reaStoneWeight, createdDate, modifiedDate, function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            buildrecord["id"] = this.lastID;
+                            return self.getBuildRecord(this.lastID, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.updateBuildRecord = function (id, buildrecord, callback) {
+    var self = this;
+    var createdDate = new Date(buildrecord.createdDate).format("yyyy-MM-dd hh:mm:ss")
+    var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("UPDATE buildrecord SET kilnName = ?, buildIndex = ?, coalWeight = ?, preRatio = ?, preStoneWeight = ?, reaStoneWeight= ?,reaRatio=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [buildrecord.kilnName,buildrecord.buildIndex, buildrecord.coalWeight, buildrecord.preRatio, buildrecord.preStoneWeight, buildrecord.reaStoneWeight, buildrecord.reaRatio, createdDate,
+            modifiedDate, id], function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            return self.getBuildRecord(id, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.deleteBuildRecord = function (id, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.get("DELETE FROM buildrecord WHERE id= ?", [id], function (error, result){
+            if (callback) {
+                if (!error) {
+                    return callback(null, {});
+                }
+                callback(error, null);
+            }
+        });   
+    });
+};
+
+DataManager.prototype.getBuildRecord = function (id, callback) {
+    db.serialize(function () {
+        db.get("SELECT * FROM buildrecord WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.searchBuildRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var selectedDate = query.date;
+    var fromDate = getSearchFromDate(selectedDate);
+    var toDate = getSearchToDate(selectedDate);
+    var kilnName = query.kilnName;
+    db.serialize(function () {
+        db.all("SELECT * FROM buildrecord WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by buildIndex ASC limit ? offset ?", [kilnName, fromDate, toDate, size, offset],  function (error, result) {
+            if (callback) {
+                self.getBuildRecordsCount(selectedDate, kilnName, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumCoalWeight":res.coalWeight,
+                            "avgPreRatio":res.preRatio,
+                            "sumPreStoneWeight":res.preStoneWeight,
+                            "avgReaRatio":res.reaRatio,
+                            "sumReaStoneWeight":res.reaStoneWeight,
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getBuildRecordsCount = function (date, kilnName, callback) {
+    db.serialize(function () {
+        var searchString;
+        var fromDate;
+        var toDate;
+        if(date){
+            fromDate = getSearchFromDate(date);
+            toDate = getSearchToDate(date);
+            searchString = "SELECT count(*) as total, SUM(coalWeight) AS coalWeight , AVG(preRatio) AS preRatio,SUM(preStoneWeight) AS preStoneWeight, AVG(reaRatio) AS reaRatio,SUM(reaStoneWeight) AS reaStoneWeight FROM buildrecord WHERE kilnName = ? AND createdDate BETWEEN ? AND ? order by buildIndex ASC";
+            db.get(searchString, [kilnName, fromDate, toDate], function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        else{
+            searchString = "SELECT count(*) as total FROM buildrecord";
+            db.get(searchString, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        
+    });
+};
+
+//search personBuildRecord
+DataManager.prototype.searchFactoryBuildRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var kilnName = query.kilnName;
+    
+    var searchStr = "SELECT buildIndex, SUM(coalWeight) AS coalWeight ,AVG(preRatio) AS preRatio, SUM(preStoneWeight) AS preStoneWeight ,SUM(reaStoneWeight) AS reaStoneWeight ,AVG(reaRatio) AS reaRatio FROM buildrecord WHERE ";
+    var searchData = [];
+    if(kilnName){
+        searchStr += "kilnName = ? AND ";
+        searchData.push(kilnName);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY buildIndex order by buildIndex ASC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getFactoryBuildRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumCoalWeight":res.coalWeight,
+                            "avgPreRatio":res.preRatio,
+                            "sumPreStoneWeight":res.preStoneWeight,
+                            "avgReaRatio":res.reaRatio,
+                            "sumReaStoneWeight":res.reaStoneWeight,
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getFactoryBuildRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var kilnName = query.kilnName;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(kilnName){
+        searchStr += "kilnName = ? AND ";
+        searchData.push(kilnName);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(DISTINCT buildIndex) as total, SUM(coalWeight) AS coalWeight ,AVG(preRatio) AS preRatio, SUM(preStoneWeight) AS preStoneWeight ,SUM(reaStoneWeight) AS reaStoneWeight ,AVG(reaRatio) AS reaRatio FROM buildrecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
 getSearchFromDate = function(date){
     var searchFromDate = new Date(date).format("yyyy-MM-dd");
     return searchFromDate;
