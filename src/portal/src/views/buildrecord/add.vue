@@ -145,9 +145,13 @@ export default {
               .then(response => {
                 var defaultKilnName = this.form.kilnName;
                 var defaultBuildIndex = parseInt(this.form.buildIndex) + 1;
+                var defaultDate = this.form.createdDate;
+                var time = defaultDate.getTime() + 60 * 1000 * 15;
+                var newDate = new Date(time);
+
                 this.form = {
                      id: 0,
-                     createdDate: new Date(),
+                     createdDate: newDate,
                      kilnName:defaultKilnName,
                      buildIndex:defaultBuildIndex,
                 };

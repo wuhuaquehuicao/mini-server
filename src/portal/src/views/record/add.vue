@@ -243,7 +243,6 @@ export default {
             })
               .then(response => {
                 this.form.id = 0;
-                this.form.createdDate = new Date();
                 this.form.name = "";
                 this.form.plateNumber = "";
                 this.form.tareWeight = "";
@@ -254,6 +253,11 @@ export default {
                 this.form.wxpaid = "";
                 this.form.unpaid = "";
                 this.form.ashWieght = "";
+
+                var defaultDate = this.form.createdDate;
+                var time = defaultDate.getTime() + 60 * 1000 * 30;
+                var newDate = new Date(time);
+                this.form.createdDate = newDate;
 
                 this.loading = false;
                 this.$message({

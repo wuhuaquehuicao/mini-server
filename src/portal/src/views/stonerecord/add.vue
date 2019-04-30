@@ -224,15 +224,21 @@ export default {
               data: self.form
             })
               .then(response => {
+                var defaultDate = this.form.createdDate;
+                var time = defaultDate.getTime() + 60 * 1000 * 30;
+                var newDate = new Date(time);
+
                 this.form = {
                     id: 0,
                     name: "",
-                    createdDate: new Date(),
+                    createdDate: newDate,
                     plateNumber: "",
                     netWeight: "",
                     recordUser:"远兰",
                     type:"大石"
                   },
+
+                  
                 this.$message({
                   message: "添加成功",
                   type: "success"
