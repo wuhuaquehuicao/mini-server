@@ -31,14 +31,17 @@
       <el-form-item label="煤炭重量" prop="coalWeight">
         <el-input v-model="form.coalWeight" auto-complete="off" placeholder="煤炭重量"/>
       </el-form-item>
-      <el-form-item label="预计比例" prop="preRatio">
-        <el-input v-model="form.preRatio" auto-complete="off" placeholder="预计比例"/>
-      </el-form-item>
+
       <el-form-item label="预计石头重量" prop="preStoneWeight">
-        <el-input v-model="form.preStoneWeight" auto-complete="off" placeholder="预计石头重量"/>
+        <el-input v-model="form.preStoneWeight" auto-complete="off" placeholder="预计石头重量" @input="inputPreStoneWeight"/>
       </el-form-item>
+
+      <el-form-item label="预计比例" prop="preRatio">
+        <el-input v-model="form.preRatio" auto-complete="off" placeholder="预计比例" />
+      </el-form-item>
+      
       <el-form-item label="实际石头重量" prop="reaStoneWeight">
-        <el-input v-model="form.reaStoneWeight" auto-complete="off" placeholder="实际石头重量"/>
+        <el-input v-model="form.reaStoneWeight" auto-complete="off" placeholder="实际石头重量" @input="inputReaStoneWeight"/>
       </el-form-item>
       <el-form-item label="实际比例" prop="reaRatio">
         <el-input v-model="form.reaRatio" auto-complete="off" placeholder="实际比例"/>
@@ -95,7 +98,11 @@ export default {
   mounted() {
     this.refresh();
   },
+  
   methods: {
+    rounding (value) {
+      return value.toFixed(2);
+    },
     refresh() {
       var self = this;
       var id = this.$route.params.id;
@@ -171,6 +178,12 @@ export default {
           return false;
         }
       });
+    },
+    inputPreStoneWeight(){
+        this.form.preRatio = this.rounding(this.form.preStoneWeight / this.form.coalWeight);
+    },
+    inputReaStoneWeight(){
+        this.form.reaRatio = this.rounding(this.form.reaStoneWeight / this.form.coalWeight);
     }
   }
 };
