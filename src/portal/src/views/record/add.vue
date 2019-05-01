@@ -242,22 +242,17 @@ export default {
               data: self.form
             })
               .then(response => {
-                this.form.id = 0;
-                this.form.name = "";
-                this.form.plateNumber = "";
-                this.form.tareWeight = "";
-                this.form.totalWeight = "";
-                this.form.netWeight = "";
-                this.form.price = "";
-                this.form.cashpaid = "";
-                this.form.wxpaid = "";
-                this.form.unpaid = "";
-                this.form.ashWieght = "";
-
+                var defaultKilnName = this.form.kilnName;
+                var defaultType = this.form.type;
                 var defaultDate = this.form.createdDate;
                 var time = defaultDate.getTime() + 60 * 1000 * 30;
                 var newDate = new Date(time);
-                this.form.createdDate = newDate;
+                this.form = {
+                  id:0,
+                  kilnName:defaultKilnName,
+                  type:defaultType,
+                  createdDate:newDate,
+                };
 
                 this.loading = false;
                 this.$message({

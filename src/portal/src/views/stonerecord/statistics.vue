@@ -267,7 +267,7 @@ export default {
               });
     },
     edit(id) {
-      this.$router.push({ name: "EditCaoRecord", params: { id: id } });
+      this.$router.push({ name: "EditStoneRecord", params: { id: id } });
     },
     personSearch(){
       var fromDate = this.personForm.searchDate[0];
