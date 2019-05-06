@@ -88,12 +88,27 @@
             />
 
             <div>
-                <el-form ref="form" :inline="true" :model="sumPersonContent" :rules="rules" style="margin-top: 40px;">
-                    <el-form-item label="总净量:" prop="sumNetWeight">
-                        <el-input v-model="sumPersonContent.sumNetWeight" auto-complete="off" v-bind:readonly="true"/>
-                    </el-form-item>
-                </el-form>
+            <div style="margin-top: 30px">
+            <el-form :inline="true" >
+                <el-form-item label="总计:">
+                </el-form-item>
+            </el-form>
             </div>
+            <el-table
+            v-loading="loading"
+            :data="sumPersonContent"
+            :header-cell-style="{background:'#F5F7FA'}"
+            style="width: 100%"
+            stripe
+            border
+            >
+            <el-table-column prop="sumNetWeight" label="总净重" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumNetWeight | rounding}}</span>
+              </template>
+            </el-table-column>
+            </el-table>
+        </div>
         </el-collapse-item>
 
         <el-collapse-item title="全厂累计统计" name="2">
@@ -134,7 +149,11 @@
                  </template>
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
-            <el-table-column prop="netWeight" label="净重" width="150"/>
+            <el-table-column prop="netWeight" label="净重" width="150">
+              <template slot-scope="scope">
+              <span>{{scope.row.netWeight | rounding}}</span>
+              </template>
+            </el-table-column>
             </el-table>
             <el-pagination
             :current-page="0"
@@ -147,12 +166,27 @@
             @current-change="factoryCurrentChange"
             />
             <div>
-                <el-form ref="form" :inline="true" :model="sumFactoryContent" :rules="rules" style="margin-top: 40px;">
-                    <el-form-item label="总净量:" prop="sumNetWeight">
-                        <el-input v-model="sumFactoryContent.sumNetWeight" auto-complete="off" v-bind:readonly="true"/>
-                    </el-form-item>
-                </el-form>
+            <div style="margin-top: 30px">
+            <el-form :inline="true" >
+                <el-form-item label="总计:">
+                </el-form-item>
+            </el-form>
             </div>
+            <el-table
+            v-loading="loading"
+            :data="sumFactoryContent"
+            :header-cell-style="{background:'#F5F7FA'}"
+            style="width: 100%"
+            stripe
+            border
+            >
+            <el-table-column prop="sumNetWeight" label="总净重" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumNetWeight | rounding}}</span>
+              </template>
+            </el-table-column>
+            </el-table>
+        </div>
         </el-collapse-item>
     </el-collapse>
   </div>
@@ -205,6 +239,11 @@ export default {
   },
   mounted() {
       this.getDealUsers();
+  },
+  filters :{
+    rounding (value) {
+      return value.toFixed(2);
+    }
   },
   methods: {
     personCurrentChange(val) {
