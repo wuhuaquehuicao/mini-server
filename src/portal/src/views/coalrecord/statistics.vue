@@ -106,7 +106,11 @@
             stripe
             border
             >
-            <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+            <el-table-column prop="sumNetWeight" label="总净重" width="120">
+              <template slot-scope="scope">
+                <span>{{scope.row.sumNetWeight | rounding}}</span>
+              </template>    
+            </el-table-column>           
             <el-table-column prop="sumPrice" label="总价格" width="120"/>
             <el-table-column prop="sumPaid" label="已支付" width="120"/>
             <el-table-column prop="sumUnpaid" label="未支付" width="120"/>
@@ -152,7 +156,11 @@
                  </template>
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
-            <el-table-column prop="netWeight" label="净重" width="150"/>
+            <el-table-column prop="netWeight" label="净重" width="150">
+              <template slot-scope="scope">
+                <span>{{scope.row.netWeight | rounding}}</span>        
+              </template>    
+            </el-table-column>
             <el-table-column prop="price" label="总价" width="150"/>
             <el-table-column prop="paid" label="已支付" width="150"/>
             <el-table-column prop="unpaid" label="未支付" width="150"/>
@@ -182,7 +190,11 @@
                     stripe
                     border
                     >
-                    <el-table-column prop="sumNetWeight" label="总净重" width="120"/>
+                    <el-table-column prop="sumNetWeight" label="总净重" width="120">
+                      <template slot-scope="scope">
+                          <span>{{scope.row.sumNetWeight | rounding}}</span>
+                          </template>    
+                    </el-table-column>
                     <el-table-column prop="sumPrice" label="总价格" width="120"/>
                     <el-table-column prop="sumPaid" label="已支付" width="120"/>
                     <el-table-column prop="sumUnpaid" label="未支付" width="120"/>
@@ -240,6 +252,11 @@ export default {
   },
   mounted() {
       this.getDealUsers();
+  },
+  filters :{
+    rounding (value) {
+      return value.toFixed(2);
+    }
   },
   methods: {
     personCurrentChange(val) {

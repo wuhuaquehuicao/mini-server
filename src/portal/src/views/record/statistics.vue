@@ -173,8 +173,16 @@
                  </template>
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
-            <el-table-column prop="netWeight" label="净重" width="150"/>
-            <el-table-column prop="ashWeight" label="灰粉" width="150"/>
+            <el-table-column prop="netWeight" label="净重" width="150">
+            <template slot-scope="scope">
+                <span>{{scope.row.netWeight | rounding}}</span>
+                </template>    
+            </el-table-column>
+            <el-table-column prop="ashWeight" label="灰粉" width="150">
+            <template slot-scope="scope">
+                <span>{{scope.row.ashWeight | rounding}}</span>
+                </template>    
+            </el-table-column>
             <el-table-column prop="price" label="总价" width="150"/>
             <el-table-column prop="cashpaid" label="现金支付" width="150"/>
             <el-table-column prop="wxpaid" label="微信支付" width="150"/>
@@ -210,7 +218,11 @@
                       <span>{{scope.row.sumNetWeight | rounding}}</span>
                       </template>
                     </el-table-column>
-                    <el-table-column prop="sumAshWeight" label="灰粉" width="120"/>
+                    <el-table-column prop="sumAshWeight" label="灰粉" width="120">
+                      <template slot-scope="scope">
+                        <span>{{scope.row.sumAshWeight | rounding}}</span>
+                      </template>    
+                    </el-table-column>
                     <el-table-column prop="sumPrice" label="总收入" width="120"/>
                     <el-table-column prop="sumCashpaid" label="现金支付" width="120"/>
                     <el-table-column prop="sumWxpaid" label="微信支付" width="120"/>

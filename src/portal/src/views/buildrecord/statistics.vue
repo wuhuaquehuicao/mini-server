@@ -35,11 +35,32 @@
             border
             >
             <el-table-column prop="buildIndex" label="加窑序号" width="80"/>
-            <el-table-column prop="coalWeight" label="煤重量" width="120"/>
-            <el-table-column prop="preStoneWeight" label="预计石头重量" width="120"/>
-            <el-table-column prop="preRatio" label="预计比例" width="120"/>
-            <el-table-column prop="reaStoneWeight" label="实际石头重量" width="120"/>
-            <el-table-column prop="reaRatio" label="实际比例" width="120"/>
+            <el-table-column prop="coalWeight" label="煤重量" width="120">
+            <template slot-scope="scope">
+                <span>{{scope.row.coalWeight | rounding}}</span>
+                </template>    
+            </el-table-column>
+            <el-table-column prop="preStoneWeight" label="预计石头重量" width="120">
+            <template slot-scope="scope">
+                <span>{{scope.row.preStoneWeight | rounding}}</span>
+                </template>    
+            </el-table-column>
+            <el-table-column prop="preRatio" label="预计比例" width="120">
+            <template slot-scope="scope">
+                <span>{{scope.row.preRatio | rounding}}</span>
+                </template>    
+            </el-table-column>
+            
+            <el-table-column prop="reaStoneWeight" label="实际石头重量" width="120">
+            <template slot-scope="scope">
+                <span>{{scope.row.reaStoneWeight | rounding}}</span>
+                </template>    
+            </el-table-column>
+            <el-table-column prop="reaRatio" label="实际比例" width="120">
+            <template slot-scope="scope">
+                <span>{{scope.row.reaRatio | rounding}}</span>
+                </template>    
+            </el-table-column>
             </el-table>
             <el-pagination
             :current-page="0"
