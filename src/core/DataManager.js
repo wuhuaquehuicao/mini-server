@@ -430,7 +430,7 @@ DataManager.prototype.searchFactoryRecords = function (query, callback) {
                     if (!error) {
                         var data = {};
                         data["content"] = result;
-                        data["total"] = 2;//res.total;
+                        data["total"] = res.total;
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
                             "sumAshWeight":res.sumAshWeight,

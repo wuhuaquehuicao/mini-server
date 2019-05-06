@@ -101,6 +101,8 @@ export default {
   
   methods: {
     rounding (value) {
+      if(value == null)
+         return value;
       return value.toFixed(2);
     },
     refresh() {

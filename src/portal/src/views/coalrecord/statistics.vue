@@ -255,6 +255,8 @@ export default {
   },
   filters :{
     rounding (value) {
+      if(value == null)
+         return value;
       return value.toFixed(2);
     }
   },
