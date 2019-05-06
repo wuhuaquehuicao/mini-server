@@ -56,12 +56,27 @@
     />
 
     <div>
-      <el-form ref="form" :inline="true" :model="sumContent" :rules="rules" style="margin-top: 40px;">
-          <el-form-item label="总净量:" prop="sumNetWeight">
-            <el-input v-model="sumContent.sumNetWeight" auto-complete="off" v-bind:readonly="true"/>
-          </el-form-item>
-      </el-form>
-    </div>
+            <div style="margin-top: 30px">
+            <el-form :inline="true" >
+                <el-form-item label="总计:">
+                </el-form-item>
+            </el-form>
+            </div>
+            <el-table
+            v-loading="loading"
+            :data="sumContent"
+            :header-cell-style="{background:'#F5F7FA'}"
+            style="width: 100%"
+            stripe
+            border
+            >
+            <el-table-column prop="sumNetWeight" label="总净重" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumNetWeight | rounding}}</span>
+              </template>
+            </el-table-column>
+            </el-table>
+        </div>
   </div>
   
 </template>

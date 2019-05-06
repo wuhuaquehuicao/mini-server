@@ -566,7 +566,7 @@ DataManager.prototype.searchStoneRecords = function (query, callback) {
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
                         };
-                        data["sumContent"] = sumContent;
+                        data["sumContent"] = [sumContent];
                         return callback(error, data);
                     }
                     callback(error, result);
