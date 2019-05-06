@@ -195,6 +195,7 @@ export default {
             })
               .then(response => {
                 self.usersOptions = response;
+                self.selectedUser(self.form.name);
                 this.loading = false;
               })
               .catch(error => {
@@ -212,6 +213,7 @@ export default {
         })
           .then(response => {
             self.form = response;
+            self.selectedUser(self.form.name);
             this.loading = false;
           })
           .catch(error => {
