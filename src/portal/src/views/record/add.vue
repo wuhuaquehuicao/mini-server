@@ -252,6 +252,7 @@ export default {
                   kilnName:defaultKilnName,
                   type:defaultType,
                   createdDate:newDate,
+                  plateNumber:"",
                 };
 
                 this.loading = false;
