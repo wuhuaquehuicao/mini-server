@@ -321,7 +321,7 @@ DataManager.prototype.searchPersonRecords = function (query, callback) {
         searchData.push(caoType);
     }
 
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC limit ? offset ?";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
     searchData.push(size);
@@ -376,7 +376,7 @@ DataManager.prototype.getPersonRecordsCount = function (query, callback) {
         searchData.push(caoType);
     }
 
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
     searchData.push(fromDate);
     searchData.push(toDate);
 
@@ -418,7 +418,7 @@ DataManager.prototype.searchFactoryRecords = function (query, callback) {
         searchData.push(caoType);
     }
 
-    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate DESC limit ? offset ?";
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate ASC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
     searchData.push(size);
@@ -467,7 +467,7 @@ DataManager.prototype.getFactoryRecordsCount = function (query, callback) {
         searchData.push(caoType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
     searchData.push(fromDate);
     searchData.push(toDate);
 
@@ -636,7 +636,7 @@ DataManager.prototype.searchPersonStoneRecords = function (query, callback) {
         searchData.push(stoneType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC limit ? offset ?";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
     searchData.push(size);
@@ -687,7 +687,7 @@ DataManager.prototype.getPersonStoneRecordsCount = function (query, callback) {
         searchData.push(stoneType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
     searchData.push(fromDate);
     searchData.push(toDate);
 
@@ -722,7 +722,7 @@ DataManager.prototype.searchFactoryStoneRecords = function (query, callback) {
         searchStr += "type = ? AND ";
         searchData.push(stoneType);
     }
-    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate DESC limit ? offset ?";
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate ASC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
     searchData.push(size);
@@ -760,7 +760,7 @@ DataManager.prototype.getFactoryStoneRecordsCount = function (query, callback) {
         searchData.push(stoneType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
     searchData.push(fromDate);
     searchData.push(toDate);
 
@@ -933,7 +933,7 @@ DataManager.prototype.searchPersonCoalRecords = function (query, callback) {
         searchData.push(coalType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC limit ? offset ?";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
     searchData.push(size);
@@ -986,7 +986,7 @@ DataManager.prototype.getPersonCoalRecordsCount = function (query, callback) {
         searchData.push(coalType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
     searchData.push(fromDate);
     searchData.push(toDate);
 
@@ -1022,7 +1022,7 @@ DataManager.prototype.searchFactoryCoalRecords = function (query, callback) {
         searchData.push(coalType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate DESC limit ? offset ?";
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate ASC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
     searchData.push(size);
@@ -1063,7 +1063,7 @@ DataManager.prototype.getFactoryCoalRecordsCount = function (query, callback) {
         searchData.push(coalType);
     }
     
-    searchStr +="createdDate BETWEEN ? AND ? order by createdDate DESC";
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
     searchData.push(fromDate);
     searchData.push(toDate);
 
