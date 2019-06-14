@@ -81,7 +81,7 @@ export default {
         {userName:"阿青"},
         {userName:"旺仔"},
         {userName:"道纯"},
-        {userName:"学兴"},
+        {userName:"云苑"},
       ],
       stoneTypeOptions:[
         {type:"小石"},

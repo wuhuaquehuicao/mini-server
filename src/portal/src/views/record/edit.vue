@@ -36,7 +36,7 @@
     </div>
     <el-form ref="form" :inline="true" :model="form" :rules="rules">
       <el-form-item label="姓名" prop="name">
-        <el-select v-model="form.name" size="small" @change="selectedUser">
+        <el-select v-model="form.name" size="small" @change="selectedUser" filterable>
           <el-option v-for="item in usersOptions"
           :key="item.id"
           :label="item.name"

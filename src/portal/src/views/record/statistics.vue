@@ -12,7 +12,7 @@
             </el-form-item>
 
             <el-form-item label="" prop="userName" >
-                <el-select v-model="personForm.userName" size="small" placeholder="选择姓名" clearable @change="selectedUser">
+                <el-select v-model="personForm.userName" size="small" placeholder="选择姓名" clearable @change="selectedUser" filterable>
                 <el-option v-for="item in usersOptions"
                 :key="item.id"
                 :label="item.name"
