@@ -115,6 +115,7 @@ export default {
       typeOptions:[
         {type:"零灰"},
         {type:"统灰"},
+        {type:"零灰打包"},
         {type:"灰粉"},
       ],
       form: {
