@@ -68,13 +68,13 @@ export const constantRouterMap = [
       }
     ]
   },
-  // 石灰记录
+  // 石灰销售记录
   {
     path: '/record',
     component: Layout,
     redirect: '/record/list',
     name: 'Record',
-    meta: { title: '石灰记录', icon: 'example' },
+    meta: { title: '石灰销售记录', icon: 'example' },
     children: [
       {
         path: 'list',
@@ -103,6 +103,43 @@ export const constantRouterMap = [
       }
     ]
   },
+
+  // 石灰外调记录
+  {
+    path: '/buycaorecord',
+    component: Layout,
+    redirect: '/buycaorecord/list',
+    name: 'BuyCaoRecord',
+    meta: { title: '石灰外调记录', icon: 'example' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/buycaorecord/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'Add',
+        component: () => import('@/views/buycaorecord/add'),
+        meta: { title: '新增', icon: 'table' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'EditCaoRecord',
+        component: () => import('@/views/buycaorecord/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: 'statistics',
+        name: 'StatisticsCaoRecord',
+        component: () => import('@/views/buycaorecord/statistics'),
+        meta: { title: '统计', icon: 'table' }
+      }
+    ]
+  },
+
   // 石头记录
   {
     path: '/stonerecord',

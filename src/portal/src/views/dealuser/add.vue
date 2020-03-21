@@ -18,6 +18,10 @@
         <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用逗号分开)"/>
       </el-form-item>
 
+      <el-form-item label="货物来源" prop="source">
+        <el-input v-model="form.source" auto-complete="off" placeholder="来源(用逗号分开)"/>
+      </el-form-item>
+
       <el-form-item label="电话" prop="phone">
         <el-input v-model="form.phone" auto-complete="off" placeholder="电话"/>
       </el-form-item>
