@@ -15,11 +15,11 @@
         </el-select>
       </el-form-item>
       <el-form-item label="车牌" prop="plateNumber">
-        <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用逗号分开)"/>
+        <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用英文逗号分开)"/>
       </el-form-item>
 
       <el-form-item label="货物来源" prop="source">
-        <el-input v-model="form.source" auto-complete="off" placeholder="来源(用逗号分开)"/>
+        <el-input v-model="form.source" auto-complete="off" placeholder="来源(用英文逗号分开)"/>
       </el-form-item>
 
       <el-form-item label="电话" prop="phone">
