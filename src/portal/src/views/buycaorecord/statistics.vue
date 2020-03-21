@@ -405,11 +405,7 @@ export default {
           toDate:toDate
       };
       
-      var kilnName = this.factoryForm.kilnName;
       var type = this.personForm.type;
-      if(kilnName){
-          params["kilnName"] = kilnName;
-      }
       if(type){
           params["type"] = type;
       }
