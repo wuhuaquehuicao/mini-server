@@ -1525,7 +1525,7 @@ DataManager.prototype.getDealUsers = function (query, callback) {
     var offset = page * size;
     var userType = query.type;
     db.serialize(function () {
-        db.all("SELECT * FROM dealUser WHERE type = ? order by id desc limit ? offset ?", [userType, size, offset], function (error, result) {
+        db.all("SELECT * FROM dealUser WHERE type = ? order by modifiedDate desc limit ? offset ?", [userType, size, offset], function (error, result) {
             if (callback) {
                 self.getDealUsersCount(userType,(err, res) => {
                     if (!error) {
