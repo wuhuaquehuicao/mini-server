@@ -44,6 +44,17 @@
                 </el-select>
             </el-form-item>
 
+            <el-form-item label="" prop="source" >
+                <el-select v-model="personForm.source" size="small" placeholder="选择来源" clearable="true">
+                <el-option v-for="item in sourceOptions"
+                :key="item.source"
+                :label="item.source"
+                :value="item.source"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
+
             <el-form-item label="" prop="type" >
                 <el-select v-model="personForm.type" size="small" placeholder="选择灰类" clearable="true">
                 <el-option v-for="item in typeOptions"
@@ -76,6 +87,7 @@
             <el-table-column prop="name" label="姓名" width="150"/>
             <el-table-column prop="plateNumber" label="车牌号" width="80"/>
             <el-table-column prop="carowner" label="车主" width="80"/>
+            <el-table-column prop="source" label="来源" width="80"/>
             <el-table-column prop="type" label="灰类" width="80"/>
             <el-table-column prop="totalWeight" label="总重" width="80"/>
             <el-table-column prop="tareWeight" label="皮重" width="80"/>
@@ -268,7 +280,8 @@ export default {
       personForm: {
         plateNumber: "",
         userName : "",
-        carowner : ""
+        carowner : "",
+        source : ""
       },
       factoryForm: {
           
@@ -278,6 +291,7 @@ export default {
           userName: [{ required: true, message: "请选择姓名", trigger: "blur" }],
           plateNumber: [{ required: true, message: "请选择车牌", trigger: "blur"}],
           carowner: [{ required: true, message: "请选择车主", trigger: "blur"}],
+          source: [{ required: true, message: "请选择来源", trigger: "blur"}],
       }
     };
   },
@@ -355,6 +369,27 @@ export default {
               }
             }
 
+        //split source
+            var sourceStr = user.source;
+            if(sourceStr){
+              var sourceArray = sourceStr.split(",");
+              var sourceOptions = [];
+              var value;
+              if(sourceArray.length > 0){
+                for(var j=0; j< sourceArray.length;j++){
+                value = sourceArray[j];
+                sourceOptions.push({"source":value});
+                
+                }
+                self.sourceOptions = sourceOptions;
+                self.personForm.source = self.sourceOptions[0].source;
+              }
+              else{
+                self.sourceOptions = [];
+                self.personForm.source = "";
+              }
+            }
+
         }
       }
     },
@@ -406,6 +441,8 @@ export default {
       var plateNumber = this.personForm.plateNumber;
       var carowner = this.personForm.carowner;
       var type = this.personForm.type;
+      var source = this.personForm.source;
+
       if(userName){
           params["userName"] = userName;
       }
@@ -414,6 +451,9 @@ export default {
       }
       if(carowner){
           params["carowner"] = carowner;
+      }
+      if(source){
+          params["source"] = source;
       }
       if(type){
           params["type"] = type;
