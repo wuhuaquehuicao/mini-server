@@ -5,16 +5,6 @@
     </div>
     <div>
       <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
-        <el-form-item label="" prop="kilnName" >
-          <el-select v-model="form.kilnName" size="small">
-            <el-option v-for="item in kilnsOptions"
-            :key="item.id"
-            :label="item.kilnName"
-            :value="item.kilnName"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
 
         <el-form-item label="" prop="type" >
           <el-select v-model="form.type" size="small">
