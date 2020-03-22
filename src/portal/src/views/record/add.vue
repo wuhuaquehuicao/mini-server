@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
       <div style="margin-bottom: 20px; font-size:16px">
-      <span>新增石灰记录：</span>
+      <span>新增石灰销售记录：</span>
     </div>
 
     <div>

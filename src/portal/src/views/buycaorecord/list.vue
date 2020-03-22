@@ -175,7 +175,7 @@ export default {
         });
     },
     edit(id) {
-      this.$router.push({ name: "EditCaoRecord", params: { id: id } });
+      this.$router.push({ name: "EditBuyCaoRecord", params: { id: id } });
     },
     search(){
       var date = this.form.createdDate;

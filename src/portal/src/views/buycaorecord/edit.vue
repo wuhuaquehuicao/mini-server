@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div style="margin-bottom: 20px; font-size:16px">
-      <span>更新石灰记录：</span>
+      <span>更新购灰记录：</span>
     </div>
     <div>
       <el-form ref="form" :inline="true" :model="form" :rules="rules" style="margin-top: 20px;">
@@ -278,7 +278,7 @@ export default {
       if (id != null && id > 0) {
         this.form.id = id;
         request({
-          url: "/records/" + id,
+          url: "/buycaorecords/" + id,
           method: "get"
         })
           .then(response => {
@@ -295,7 +295,7 @@ export default {
       }
     },
     deleteRecord(){
-      this.$confirm('你确定要删除该石灰记录吗？', '提示', {
+      this.$confirm('你确定要删除该购灰记录吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -305,7 +305,7 @@ export default {
           if (valid) {
             if (self.form.id != null && self.form.id > 0) {
               request({
-                url: "/records/" + self.form.id,
+                url: "/buycaorecords/" + self.form.id,
                 method: "post",
                 data: self.form
               })
@@ -332,7 +332,7 @@ export default {
         if (valid) {
           if (self.form.id != null && self.form.id > 0) {
             request({
-              url: "/records/" + self.form.id,
+              url: "/buycaorecords/" + self.form.id,
               method: "put",
               data: self.form
             })
@@ -347,7 +347,7 @@ export default {
               });
           } else {
             request({
-              url: "/records",
+              url: "/buycaorecords",
               method: "post",
               data: self.form
             })

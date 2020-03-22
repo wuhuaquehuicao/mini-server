@@ -126,14 +126,14 @@ export const constantRouterMap = [
       },
       {
         path: 'edit/:id',
-        name: 'EditCaoRecord',
+        name: 'EditBuyCaoRecord',
         component: () => import('@/views/buycaorecord/edit'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
       },
       {
         path: 'statistics',
-        name: 'StatisticsCaoRecord',
+        name: 'StatisticsBuyCaoRecord',
         component: () => import('@/views/buycaorecord/statistics'),
         meta: { title: '统计', icon: 'table' }
       }
