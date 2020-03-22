@@ -56,6 +56,17 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="车主" prop="carowner">
+        <el-select v-model="form.carowner" size="small" clearable>
+          <el-option v-for="item in carownerOptions"
+          :key="item.carowner"
+          :label="item.carowner"
+          :value="item.carowner"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="货物来源" prop="source">
         <el-select v-model="form.source" size="small" clearable>
           <el-option v-for="item in sourceOptions"
@@ -137,6 +148,8 @@ export default {
         createdDate: new Date(),
         plateNumber: "",
         tareWeight: "",
+        source:"",
+        carowner:"",
         kilnName:"新窑"
       },
       total: 0,
@@ -213,6 +226,27 @@ export default {
               else{
                 self.sourceOptions = [];
                 self.form.source = "";
+              }
+            }
+
+             //split carowner
+            var carownerStr = user.carowner;
+            if(carownerStr){
+              var carownerArray = carownerStr.split(",");
+              var carownerOptions = [];
+              var value;
+              if(carownerArray.length > 0){
+                for(var j=0; j< carownerArray.length;j++){
+                value = carownerArray[j];
+                carownerOptions.push({"carowner":value});
+                
+                }
+                self.carownerOptions = carownerOptions;
+                self.form.carowner = self.carownerOptions[0].carowner;
+              }
+              else{
+                self.carownerOptions = [];
+                self.form.carowner = "";
               }
             }
 

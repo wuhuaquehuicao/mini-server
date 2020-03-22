@@ -49,7 +49,7 @@ function DataManager() {
             db.run("INSERT INTO user (name, email,mobile,password) VALUES (?,?,?,?)", admin.name, admin.email, admin.mobile, admin.password);
         }
 
-        db.run("CREATE TABLE IF NOT EXISTS dealUser (id INTEGER primary key, name TEXT, plateNumber TEXT, source TEXT, phone TEXT, address TEXT, type TEXT, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS dealUser (id INTEGER primary key, name TEXT, plateNumber TEXT, source TEXT, carowner TEXT, phone TEXT, address TEXT, type TEXT, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS coalrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, price INT, paid INT, unpaid INT, note TEXT,type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS stonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
@@ -490,8 +490,8 @@ DataManager.prototype.addBuyCaoRecord = function (record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO buycaorecord (type, name, plateNumber, source,totalWeight,tareWeight,netWeight,ashWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            record.type, record.name, record.plateNumber, record.source, record.totalWeight, record.tareWeight, record.netWeight, record.ashWeight,record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO buycaorecord (type, name, plateNumber, carowner, source,totalWeight,tareWeight,netWeight,ashWeight,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            record.type, record.name, record.plateNumber, record.carowner ,record.source, record.totalWeight, record.tareWeight, record.netWeight, record.ashWeight,record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -511,8 +511,8 @@ DataManager.prototype.updateBuyCaoRecord = function (id, record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss")
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE buycaorecord SET type = ?, name = ?, plateNumber = ?, source = ?, totalWeight = ?, tareWeight= ?,netWeight=?, ashWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
-            [record.type, record.name, record.plateNumber, record.source, record.totalWeight, record.tareWeight, record.netWeight, record.ashWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate,
+        db.run("UPDATE buycaorecord SET type = ?, name = ?, plateNumber = ?, carowner = ? ,source = ?, totalWeight = ?, tareWeight= ?,netWeight=?, ashWeight=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.type, record.name, record.plateNumber, record.carowner, record.source, record.totalWeight, record.tareWeight, record.netWeight, record.ashWeight, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -626,7 +626,8 @@ DataManager.prototype.searchPersonBuyCaoRecords = function (query, callback) {
     var toDate = getSearchToDate(query.toDate);
     var userName = query.userName;
     var plateNumber = query.plateNumber;
-    var source = query.source
+    var source = query.source;
+    var carowner = query.carowner;
 
     var searchStr = "SELECT * FROM buycaorecord WHERE ";
     var searchData = [];
@@ -638,6 +639,11 @@ DataManager.prototype.searchPersonBuyCaoRecords = function (query, callback) {
     if(plateNumber){
         searchStr += "plateNumber = ? AND ";
         searchData.push(plateNumber);
+    }
+
+    if(carowner){
+        searchStr += "carowner = ? AND ";
+        searchData.push(carowner);
     }
 
     if(source){
@@ -688,6 +694,7 @@ DataManager.prototype.getPersonBuyCaoRecordsCount = function (query, callback) {
     var userName = query.userName;
     var plateNumber = query.plateNumber;
     var source = query.source;
+    var carowner = query.carowner;
     
     var searchStr = "WHERE ";
     var searchData = [];
@@ -699,6 +706,11 @@ DataManager.prototype.getPersonBuyCaoRecordsCount = function (query, callback) {
     if(plateNumber){
         searchStr += "plateNumber = ? AND ";
         searchData.push(plateNumber);
+    }
+
+    if(carowner){
+        searchStr += "carowner = ? AND ";
+        searchData.push(carowner);
     }
 
     if(source){
@@ -1415,8 +1427,8 @@ DataManager.prototype.addDealUser = function (dealUser, callback) {
                 callback(null, {error:"已经存在该用户，请用其他名字。"})
             }
             else{
-                db.run("INSERT INTO dealUser (name, type,phone, plateNumber, source,address,modifiedDate) VALUES (?,?,?,?,?,?,?)",
-            dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.source, dealUser.address, modifiedDate, function (error, result) {
+                db.run("INSERT INTO dealUser (name, type,phone, plateNumber, source, carowner, address,modifiedDate) VALUES (?,?,?,?,?,?,?,?)",
+            dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.source, dealUser.carowner,dealUser.address, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -1441,8 +1453,8 @@ DataManager.prototype.updateDealUser = function (id, dealUser, callback) {
                 callback(null, {error:"已经存在该用户，请用其他名字。"})
             }
             else{
-                db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, source = ?, address = ?, modifiedDate = ? WHERE id = ?",
-            [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.source, dealUser.address, modifiedDate, id], function (error, result) {
+                db.run("UPDATE dealUser SET name = ?, type=?, phone = ?, plateNumber =?, source = ?, carowner = ?, address = ?, modifiedDate = ? WHERE id = ?",
+            [dealUser.name, dealUser.type, dealUser.phone, dealUser.plateNumber, dealUser.source, dealUser.carowner, dealUser.address, modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {

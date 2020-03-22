@@ -18,6 +18,10 @@
         <el-input v-model="form.plateNumber" auto-complete="off" placeholder="车牌(用英文逗号分开)"/>
       </el-form-item>
 
+      <el-form-item label="车主" prop="carowner">
+        <el-input v-model="form.carowner" auto-complete="off" placeholder="车主(用英文逗号分开)"/>
+      </el-form-item>
+
       <el-form-item label="货物来源" prop="source">
         <el-input v-model="form.source" auto-complete="off" placeholder="来源(用英文逗号分开)"/>
       </el-form-item>
@@ -66,7 +70,9 @@ export default {
         id: 0,
         name: "",
         phone: "",
-        plateNumber:""
+        plateNumber:"",
+        source:"",
+        carowner:""
       },
       total: 0,
       pageSize: 100,

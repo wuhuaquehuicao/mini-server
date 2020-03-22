@@ -39,6 +39,7 @@
       </el-table-column>
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="plateNumber" label="车牌号" width="80"/>
+      <el-table-column prop="carowner" label="来主" width="80"/>
       <el-table-column prop="type" label="灰类" width="80"/>
       <el-table-column prop="source" label="来源" width="120"/>
       <el-table-column prop="totalWeight" label="总重" width="80"/>

@@ -34,6 +34,7 @@
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="phone" label="电话" width="120"/>
       <el-table-column prop="plateNumber" label="车牌" width="200"/>
+      <el-table-column prop="carowner" label="车主" width="200"/>
       <el-table-column prop="source" label="货物来源" width="200"/>
       <el-table-column prop="address" label="地址" width="200"/>
       <el-table-column prop="modifiedDate" label="修改时间" width="200"/>

@@ -33,6 +33,17 @@
                 </el-select>
             </el-form-item>
 
+            <el-form-item label="" prop="carowner" >
+                <el-select v-model="personForm.carowner" size="small" placeholder="选择车主" clearable="true">
+                <el-option v-for="item in carownerOptions"
+                :key="item.carowner"
+                :label="item.carowner"
+                :value="item.carowner"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
+
             <el-form-item label="" prop="type" >
                 <el-select v-model="personForm.type" size="small" placeholder="选择灰类" clearable="true">
                 <el-option v-for="item in typeOptions"
@@ -64,6 +75,7 @@
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
             <el-table-column prop="plateNumber" label="车牌号" width="80"/>
+            <el-table-column prop="carowner" label="车主" width="80"/>
             <el-table-column prop="type" label="灰类" width="80"/>
             <el-table-column prop="totalWeight" label="总重" width="80"/>
             <el-table-column prop="tareWeight" label="皮重" width="80"/>
@@ -255,7 +267,8 @@ export default {
       ],
       personForm: {
         plateNumber: "",
-        userName : ""
+        userName : "",
+        carowner : ""
       },
       factoryForm: {
           
@@ -264,6 +277,7 @@ export default {
           searchDate: [{ required: true, message: "请选择时间", trigger: "blur" }],
           userName: [{ required: true, message: "请选择姓名", trigger: "blur" }],
           plateNumber: [{ required: true, message: "请选择车牌", trigger: "blur"}],
+          carowner: [{ required: true, message: "请选择车主", trigger: "blur"}],
       }
     };
   },
@@ -319,6 +333,28 @@ export default {
               self.personForm.plateNumber = "";
             }
           }
+
+         //split carowner
+            var carownerStr = user.carowner;
+            if(carownerStr){
+              var carownerArray = carownerStr.split(",");
+              var carownerOptions = [];
+              var value;
+              if(carownerArray.length > 0){
+                for(var j=0; j< carownerArray.length;j++){
+                value = carownerArray[j];
+                carownerOptions.push({"carowner":value});
+                
+                }
+                self.carownerOptions = carownerOptions;
+                self.personForm.carowner = self.carownerOptions[0].carowner;
+              }
+              else{
+                self.carownerOptions = [];
+                self.personForm.carowner = "";
+              }
+            }
+
         }
       }
     },
@@ -368,12 +404,16 @@ export default {
       
       var userName = this.personForm.userName;
       var plateNumber = this.personForm.plateNumber;
+      var carowner = this.personForm.carowner;
       var type = this.personForm.type;
       if(userName){
           params["userName"] = userName;
       }
       if(plateNumber){
           params["plateNumber"] = plateNumber;
+      }
+      if(carowner){
+          params["carowner"] = carowner;
       }
       if(type){
           params["type"] = type;
