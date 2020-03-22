@@ -346,9 +346,8 @@ export default {
               self.plateNOptions = [];
               self.personForm.plateNumber = "";
             }
-          }
 
-         //split carowner
+            //split carowner
             var carownerStr = user.carowner;
             if(carownerStr){
               var carownerArray = carownerStr.split(",");
@@ -389,6 +388,8 @@ export default {
                 self.personForm.source = "";
               }
             }
+
+          }
 
         }
       }
