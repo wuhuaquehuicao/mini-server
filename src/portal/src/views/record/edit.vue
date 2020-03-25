@@ -64,8 +64,8 @@
       <el-form-item label="净重" prop="netWeight">
         <el-input v-model="form.netWeight" auto-complete="off" placeholder="净重"/>
       </el-form-item>
-      <el-form-item label="灰粉" prop="ashWieght">
-        <el-input v-model="form.ashWieght" auto-complete="off" placeholder="灰粉净重"/>
+      <el-form-item label="灰粉" prop="ashWeight">
+        <el-input v-model="form.ashWeight" auto-complete="off" placeholder="灰粉净重"/>
       </el-form-item>
       <el-form-item label="总价" prop="price">
         <el-input v-model="form.price" auto-complete="off" placeholder="总价"/>

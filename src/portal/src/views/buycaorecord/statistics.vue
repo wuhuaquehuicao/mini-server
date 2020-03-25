@@ -400,7 +400,7 @@ export default {
               url: "/alldealUsers",
               method: "get",
               params: {
-              type: "石灰"
+              type: "外调"
             }
             })
               .then(response => {

@@ -67,6 +67,8 @@ export default {
     return {
       content: [],
       userTypeOptions:[
+        {"type":"外调",
+        },
         {"type":"石灰",
         },{
           "type":"石头",
