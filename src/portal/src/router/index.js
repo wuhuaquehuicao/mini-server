@@ -245,6 +245,41 @@ export const constantRouterMap = [
       }
     ]
   },
+  // 其他记录
+  {
+    path: '/otherrecord',
+    component: Layout,
+    redirect: '/otherrecord/list',
+    name: 'OtherRecord',
+    meta: { title: '其他记录', icon: 'example' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/otherrecord/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'Add',
+        component: () => import('@/views/otherrecord/add'),
+        meta: { title: '新增', icon: 'table' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'EditOtherRecord',
+        component: () => import('@/views/otherrecord/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: 'statistics',
+        name: 'StatisticsOtherRecord',
+        component: () => import('@/views/otherrecord/statistics'),
+        meta: { title: '统计', icon: 'table' }
+      }
+    ]
+  },
   // 个人中心
   {
     path: '/user',

@@ -27,16 +27,16 @@
        </template>
       </el-table-column>
       <el-table-column prop="name" label="姓名" width="150"/>
-      <el-table-column prop="plateNumber" label="车牌号" width="150"/>
-      <el-table-column prop="type" label="石头类型" width="150"/>
-      <el-table-column prop="netWeight" label="净重" width="150"/>
-      <el-table-column prop="recordUser" label="记录人员" width="150"/>
-      <el-table-column prop="createdDate" label="到厂时间">
+      <el-table-column prop="type" label="类型" width="150"/>
+      <el-table-column prop="price" label="金额" width="150"/>
+      <el-table-column prop="count" label="数量" width="150"/>
+      <el-table-column prop="note" label="备注" width="150"/>
+      <el-table-column prop="createdDate" label="记录时间">
         <template slot-scope="scope">
             <span>{{ new Date(scope.row.createdDate) | formatDate('hh:mm:ss') }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="modifiedDate" label="修改时间"/>
+      <el-table-column prop="modifiedDate" label="更新时间"/>
       <el-table-column label="操作" width="80">
         <template slot-scope="scope">
           <!-- <el-button @click="$router.push({ name: 'Detail', params: {id: scope.row.id} })">详情</el-button> -->
@@ -55,28 +55,7 @@
       @current-change="currentChange"
     />
 
-    <div>
-            <div style="margin-top: 30px">
-            <el-form :inline="true" >
-                <el-form-item label="总计:">
-                </el-form-item>
-            </el-form>
-            </div>
-            <el-table
-            v-loading="loading"
-            :data="sumContent"
-            :header-cell-style="{background:'#F5F7FA'}"
-            style="width: 100%"
-            stripe
-            border
-            >
-            <el-table-column prop="sumNetWeight" label="总净重" width="120">
-              <template slot-scope="scope">
-              <span>{{scope.row.sumNetWeight | rounding}}</span>
-              </template>
-            </el-table-column>
-            </el-table>
-        </div>
+    
   </div>
   
 </template>
@@ -89,21 +68,14 @@ export default {
   data() {
     return {
       content: [],
-      sumContent:[],
       loading: true,
       total: 0,
       pageSize: 100,
       currentPage: 1,
       dialogFormVisible: false,
       formLabelWidth: "120px",
-      oliCompanies: [],
-      kilnsOptions:[
-        {id:1, kilnName:"新窑"},
-        {id:2, kilnName:"老窑"},
-      ],
       form: {
         createdDate: new Date(),
-        kilnName: "新窑"
       },
       rules: {
         name: [{ required: true, message: "请输入站点名称", trigger: "blur" }],
@@ -132,12 +104,12 @@ export default {
       this.search();
     },
     edit(id) {
-      this.$router.push({ name: "EditStoneRecord", params: { id: id } });
+      this.$router.push({ name: "EditOtherRecord", params: { id: id } });
     },
     search(){
       var date = this.form.createdDate;
       request({
-        url: "/searchStoneRecords",
+        url: "/searchOtherRecords",
         method: "get",
         params: {
           size: this.pageSize,
@@ -147,7 +119,6 @@ export default {
       })
         .then(response => {
           this.content = response.content;
-          this.sumContent = response.sumContent;
           this.total = response.total;
           this.loading = false;
         })

@@ -67,6 +67,9 @@ export default {
         },{
           "type":"煤炭",
         }
+        ,{
+          "type":"其他",
+        }
       ],
       form: {
         id: 0,

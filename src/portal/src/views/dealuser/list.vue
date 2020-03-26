@@ -75,6 +75,9 @@ export default {
         },{
           "type":"煤炭",
         }
+        ,{
+          "type":"其他",
+        }
       ],
       loading: true,
       total: 0,

@@ -21,20 +21,9 @@
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="" prop="plateNumber" >
-                <el-select v-model="personForm.plateNumber" size="small" placeholder="选择车牌" :clearable="true">
-                <el-option v-for="item in plateNOptions"
-                :key="item.plateNumber"
-                :label="item.plateNumber"
-                :value="item.plateNumber"
-                >
-                </el-option>
-                </el-select>
-            </el-form-item>
-
             <el-form-item label="" prop="type" >
-                <el-select v-model="personForm.type" size="small" placeholder="选择石头类型" :clearable="true">
-                <el-option v-for="item in stoneTypeOptions"
+                <el-select v-model="personForm.type" size="small" placeholder="选择类型" :clearable="true">
+                <el-option v-for="item in typeOptions"
                 :key="item.type"
                 :label="item.type"
                 :value="item.type"
@@ -62,11 +51,10 @@
                 </template>
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
-            <el-table-column prop="plateNumber" label="车牌号" width="80"/>
-            <el-table-column prop="type" label="石头类型" width="80"/>
-            <el-table-column prop="netWeight" label="净重" width="80"/>
-            <el-table-column prop="recordUser" label="记录人员" width="80"/>
-            <el-table-column prop="createdDate" label="入厂时间" width="160">
+            <el-table-column prop="type" label="类型" width="80"/>
+            <el-table-column prop="price" label="金额" width="80"/>
+            <el-table-column prop="count" label="数量" width="80"/>
+            <el-table-column prop="createdDate" label="记录时间" width="160">
             </el-table-column>
             <el-table-column prop="modifiedDate" label="修改时间" width="160"/>
             <el-table-column label="操作" width="80">
@@ -102,11 +90,18 @@
             stripe
             border
             >
-            <el-table-column prop="sumNetWeight" label="总净重" width="120">
+            <el-table-column prop="sumPrice" label="总金额" width="120">
               <template slot-scope="scope">
-              <span>{{scope.row.sumNetWeight | rounding}}</span>
+              <span>{{scope.row.sumPrice | rounding}}</span>
               </template>
             </el-table-column>
+
+            <el-table-column prop="sumCount" label="总数量" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumCount | rounding}}</span>
+              </template>
+            </el-table-column>
+
             </el-table>
         </div>
         </el-collapse-item>
@@ -120,8 +115,8 @@
             </el-form-item>
 
             <el-form-item label="" prop="type" >
-                <el-select v-model="factoryForm.type" size="small" :clearable="true" placeholder="选择石头类型">
-                <el-option v-for="item in stoneTypeOptions"
+                <el-select v-model="factoryForm.type" size="small" :clearable="true" placeholder="选择类型">
+                <el-option v-for="item in typeOptions"
                 :key="item.type"
                 :label="item.type"
                 :value="item.type"
@@ -149,10 +144,17 @@
                  </template>
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
-            <el-table-column prop="netWeight" label="净重" width="150">
-              <template slot-scope="scope">
-              <span>{{scope.row.netWeight | rounding}}</span>
-              </template>
+            <el-table-column prop="type" label="类型" width="80"/>
+            <el-table-column prop="price" label="金额" width="80"/>
+            <el-table-column prop="count" label="数量" width="80"/>
+            <el-table-column prop="createdDate" label="记录时间" width="160">
+            </el-table-column>
+            <el-table-column prop="modifiedDate" label="修改时间" width="160"/>
+            <el-table-column label="操作" width="80">
+                <template slot-scope="scope">
+                <!-- <el-button @click="$router.push({ name: 'Detail', params: {id: scope.row.id} })">详情</el-button> -->
+                <el-button type="primary" @click="edit(scope.row.id)">编辑</el-button>
+                </template>
             </el-table-column>
             </el-table>
             <el-pagination
@@ -180,11 +182,18 @@
             stripe
             border
             >
-            <el-table-column prop="sumNetWeight" label="总净重" width="120">
+            <el-table-column prop="sumPrice" label="总金额" width="120">
               <template slot-scope="scope">
-              <span>{{scope.row.sumNetWeight | rounding}}</span>
+              <span>{{scope.row.sumPrice | rounding}}</span>
               </template>
             </el-table-column>
+
+             <el-table-column prop="sumCount" label="总数量" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumCount | rounding}}</span>
+              </template>
+            </el-table-column>
+
             </el-table>
         </div>
         </el-collapse-item>
@@ -217,12 +226,15 @@ export default {
       oliCompanies: [],
       usersOptions: [
       ],
-      stoneTypeOptions:[
-        {type:"小石"},
-        {type:"大石"},
+      typeOptions:[
+        {type:"支款"},
+        {type:"加油"},
+        {type:"伙食"},
+        {type:"维修"},
+        {type:"设备工具"},
       ],
       personForm: {
-        plateNumber: "",
+        type: "",
         userName : ""
       },
       factoryForm: {
@@ -231,7 +243,7 @@ export default {
       rules: {
           searchDate: [{ required: true, message: "请选择时间", trigger: "blur" }],
           userName: [{ required: true, message: "请选择姓名", trigger: "blur" }],
-          plateNumber: [{ required: true, message: "请选择车牌", trigger: "blur"}],
+          type: [{ required: true, message: "请选择类型", trigger: "blur"}],
       }
     };
   },
@@ -263,29 +275,7 @@ export default {
         for(var i=0; i < self.usersOptions.length; i++){
           var user = self.usersOptions[i];
           if(user.name == obj){
-            var plateStr = user.plateNumber;
-            if(plateStr){
-              var plateNArray = plateStr.split(",");
-              var plateNOptions = [];
-              var value;
-              if(plateNArray.length > 0){
-                for(var j=0; j< plateNArray.length;j++){
-                value = plateNArray[j];
-                plateNOptions.push({"plateNumber":value});
-                
-                }
-                self.plateNOptions = plateNOptions;
-                self.personForm.plateNumber = self.plateNOptions[0].plateNumber;
-              }
-              else{
-                self.plateNOptions = [];
-                self.personForm.plateNumber = "";
-              }
-            }
-            else{
-              self.plateNOptions = [];
-              self.personForm.plateNumber = "";
-            }
+            
           }
         }
       }
@@ -296,7 +286,7 @@ export default {
               url: "/alldealUsers",
               method: "get",
               params: {
-              type: "石头"
+              type: "其他"
             }
             })
               .then(response => {
@@ -308,7 +298,7 @@ export default {
               });
     },
     edit(id) {
-      this.$router.push({ name: "EditStoneRecord", params: { id: id } });
+      this.$router.push({ name: "EditOtherRecord", params: { id: id } });
     },
     personSearch(){
       var fromDate = this.personForm.searchDate[0];
@@ -321,20 +311,17 @@ export default {
       };
       
       var userName = this.personForm.userName;
-      var plateNumber = this.personForm.plateNumber;
-      var stoneType = this.personForm.type;
+      var type = this.personForm.type;
       if(userName){
           params["userName"] = userName;
       }
-      if(plateNumber){
-          params["plateNumber"] = plateNumber;
-      }
-      if(stoneType){
-          params["type"] = stoneType;
+    
+      if(type){
+          params["type"] = type;
       }
 
       request({
-        url: "/searchPersonStoneRecords",
+        url: "/searchPersonOtherRecords",
         method: "get",
         params: params
       })
@@ -349,6 +336,7 @@ export default {
           console.log(error);
         });
     },
+
     factorySearch(){
       var fromDate = this.factoryForm.searchDate[0];
       var toDate = this.factoryForm.searchDate[1];
@@ -359,13 +347,13 @@ export default {
           toDate:toDate
       };
       
-      var stoneType = this.factoryForm.type;
-      if(stoneType){
-          params["type"] = stoneType;
+      var type = this.factoryForm.type;
+      if(type){
+          params["type"] = type;
       }
 
       request({
-        url: "/searchFactoryStoneRecords",
+        url: "/searchFactoryOtherRecords",
         method: "get",
         params: params
       })

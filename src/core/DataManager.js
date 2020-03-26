@@ -54,6 +54,7 @@ function DataManager() {
         db.run("CREATE TABLE IF NOT EXISTS stonerecord (id INTEGER primary key, name TEXT, plateNumber TEXT, type TEXT, recordUser TEXT, netWeight INT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS buycaorecord (id INTEGER primary key, name TEXT, plateNumber TEXT, source TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS otherrecord (id INTEGER primary key, name TEXT, note TEXT, type TEXT, price INT, count INT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
 
@@ -1765,6 +1766,291 @@ DataManager.prototype.getFactoryBuildRecordsCount = function (query, callback) {
             });    
     });
 };
+
+
+//Handle other record
+DataManager.prototype.addOtherRecord = function (record, callback) {
+    var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("INSERT INTO otherrecord (type, name, price, count,note,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?)",
+            record.type, record.name, record.price, record.count, record.note, createdDate, modifiedDate, function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            record["id"] = this.lastID;
+                            self.updateDealUserUpdateTime(record.name);
+                            return self.getOtherRecord(this.lastID, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.updateOtherRecord = function (id, record, callback) {
+    var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss")
+    var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("UPDATE otherrecord SET type = ?, name = ?, price = ?, count = ?, note = ?, createdDate=?, modifiedDate=?  WHERE id = ?",
+            [record.type, record.name, record.price, record.count, record.note, createdDate,
+            modifiedDate, id], function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            return self.getOtherRecord(id, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.deleteOtherRecord = function (id, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.get("DELETE FROM otherrecord WHERE id= ?", [id], function (error, result){
+            if (callback) {
+                if (!error) {
+                    return callback(null, {});
+                }
+                callback(error, null);
+            }
+        });   
+    });
+};
+
+DataManager.prototype.getOtherRecord = function (id, callback) {
+    db.serialize(function () {
+        db.get("SELECT * FROM otherrecord WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.searchOtherRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var selectedDate = query.date;
+    var fromDate = getSearchFromDate(selectedDate);
+    var toDate = getSearchToDate(selectedDate);
+
+    db.serialize(function () {
+        db.all("SELECT * FROM otherrecord WHERE createdDate BETWEEN ? AND ? order by type DESC, createdDate ASC limit ? offset ?", [fromDate, toDate, size, offset],  function (error, result) {
+            if (callback) {
+                self.getOtherRecordsCount(selectedDate, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getOtherRecordsCount = function (date, callback) {
+    db.serialize(function () {
+        var searchString;
+        var fromDate;
+        var toDate;
+        if(date){
+            fromDate = getSearchFromDate(date);
+            toDate = getSearchToDate(date);
+            searchString = "SELECT count(*) as total FROM otherrecord WHERE createdDate BETWEEN ? AND ? order by modifiedDate DESC";
+            db.get(searchString, [fromDate, toDate], function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        else{
+            searchString = "SELECT count(*) as total FROM otherrecord";
+            db.get(searchString, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        
+    });
+};
+
+//search personOtherRecord
+DataManager.prototype.searchPersonOtherRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var type = query.type;
+
+    var searchStr = "SELECT * FROM otherrecord WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(type){
+        searchStr += "type = ? AND ";
+        searchData.push(type);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getPersonOtherRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumPrice":res.sumPrice,
+                            "sumCount":res.sumCount,
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getPersonOtherRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var type = query.type;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(type){
+        searchStr += "type = ? AND ";
+        searchData.push(type);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(*) as total, SUM(price) AS sumPrice ,SUM(count) AS sumCount FROM otherrecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
+//Search factoryOtherRecord
+DataManager.prototype.searchFactoryOtherRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    
+    var searchStr = "SELECT name AS name, SUM(price) AS price ,SUM(count) AS count FROM otherrecord WHERE ";
+    var searchData = [];
+
+    var type = query.type;
+    if(type){
+        searchStr += "type = ? AND ";
+        searchData.push(type);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate ASC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getFactoryOtherRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumPrice":res.sumPrice,
+                            "sumCount":res.sumCount,
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getFactoryOtherRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+
+    var type = query.type;
+    if(type){
+        searchStr += "type = ? AND ";
+        searchData.push(type);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(DISTINCT name) as total, SUM(price) AS sumPrice ,SUM(count) AS sumCount FROM otherrecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
 
 getSearchFromDate = function(date){
     var searchFromDate = new Date(date).format("yyyy-MM-dd");
