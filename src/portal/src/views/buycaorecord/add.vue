@@ -126,7 +126,9 @@ export default {
         {type:"零灰"},
         {type:"统灰"},
         {type:"零灰打包"},
+        {type:"统灰打包"},
         {type:"灰粉"},
+        {type:"灰渣"},
       ],
       form: {
         id: 0,
