@@ -93,7 +93,7 @@ export default {
         createdDate: new Date(),
         plateNumber: "",
         netWeight: "",
-        recordUser:"远兰",
+        recordUser:"阿青",
         type:"大石"
       },
       total: 0,
@@ -228,14 +228,20 @@ export default {
                 var time = defaultDate.getTime() + 60 * 1000 * 30;
                 var newDate = new Date(time);
 
+                var defaultName = this.form.name;
+                var defaultPlateNumber = this.form.plateNumber;
+                var defaultRecordUser = this.form.recordUser;
+                var defaultType = this.form.type;
+
                 this.form = {
                     id: 0,
-                    name: "",
+                    name: defaultName,
                     createdDate: newDate,
-                    plateNumber: "",
+                    plateNumber: defaultPlateNumber,
                     netWeight: "",
-                    recordUser:"远兰",
-                    type:"大石"
+                    price:"",
+                    recordUser:defaultRecordUser,
+                    type:defaultType
                   },
 
                   
