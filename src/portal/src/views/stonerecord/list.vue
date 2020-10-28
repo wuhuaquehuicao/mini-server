@@ -30,6 +30,7 @@
       <el-table-column prop="plateNumber" label="车牌号" width="150"/>
       <el-table-column prop="type" label="石头类型" width="150"/>
       <el-table-column prop="netWeight" label="净重" width="150"/>
+      <el-table-column prop="price" label="金额" width="150"/>
       <el-table-column prop="recordUser" label="记录人员" width="150"/>
       <el-table-column prop="createdDate" label="到厂时间">
         <template slot-scope="scope">

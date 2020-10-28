@@ -65,6 +65,7 @@
             <el-table-column prop="plateNumber" label="车牌号" width="80"/>
             <el-table-column prop="type" label="石头类型" width="80"/>
             <el-table-column prop="netWeight" label="净重" width="80"/>
+            <el-table-column prop="price" label="金额" width="80"/>
             <el-table-column prop="recordUser" label="记录人员" width="80"/>
             <el-table-column prop="createdDate" label="入厂时间" width="160">
             </el-table-column>
@@ -105,6 +106,11 @@
             <el-table-column prop="sumNetWeight" label="总净重" width="120">
               <template slot-scope="scope">
               <span>{{scope.row.sumNetWeight | rounding}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="sumPrice" label="总金额" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumPrice | rounding}}</span>
               </template>
             </el-table-column>
             </el-table>
@@ -154,6 +160,11 @@
               <span>{{scope.row.netWeight | rounding}}</span>
               </template>
             </el-table-column>
+            <el-table-column prop="price" label="金额" width="150">
+              <template slot-scope="scope">
+              <span>{{scope.row.price | rounding}}</span>
+              </template>
+            </el-table-column>
             </el-table>
             <el-pagination
             :current-page="0"
@@ -183,6 +194,11 @@
             <el-table-column prop="sumNetWeight" label="总净重" width="120">
               <template slot-scope="scope">
               <span>{{scope.row.sumNetWeight | rounding}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="sumPrice" label="总金额" width="120">
+              <template slot-scope="scope">
+              <span>{{scope.row.sumPrice | rounding}}</span>
               </template>
             </el-table-column>
             </el-table>

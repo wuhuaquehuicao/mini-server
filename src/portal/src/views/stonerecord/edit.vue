@@ -27,6 +27,9 @@
       <el-form-item label="净重" prop="netWeight">
         <el-input v-model="form.netWeight" auto-complete="off" placeholder="净重"/>
       </el-form-item>
+      <el-form-item label="金额" prop="price">
+        <el-input v-model="form.price" auto-complete="off" placeholder="金额"/>
+      </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="form.type" size="small">
           <el-option v-for="item in stoneTypeOptions"

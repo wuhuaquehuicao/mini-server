@@ -828,8 +828,8 @@ DataManager.prototype.addStoneRecord = function (stoneRecord, callback) {
     var createdDate = new Date(stoneRecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO stonerecord (name, plateNumber,netWeight,type,recordUser,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?)",
-            stoneRecord.name, stoneRecord.plateNumber, stoneRecord.netWeight, stoneRecord.type, stoneRecord.recordUser, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO stonerecord (name, plateNumber,netWeight,price,type,recordUser,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?)",
+            stoneRecord.name, stoneRecord.plateNumber, stoneRecord.netWeight, stoneRecord.price,stoneRecord.type, stoneRecord.recordUser, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -848,8 +848,8 @@ DataManager.prototype.updateStoneRecord = function (id, stoneRecord, callback) {
     var createdDate = new Date(stoneRecord.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE stonerecord SET name = ?, plateNumber = ?, type = ?, netWeight=?, recordUser=?,createdDate=?,modifiedDate=?  WHERE id = ?",
-            [stoneRecord.name, stoneRecord.plateNumber, stoneRecord.type, stoneRecord.netWeight, stoneRecord.recordUser, createdDate,
+        db.run("UPDATE stonerecord SET name = ?, plateNumber = ?, type = ?, netWeight=?, price=?, recordUser=?,createdDate=?,modifiedDate=?  WHERE id = ?",
+            [stoneRecord.name, stoneRecord.plateNumber, stoneRecord.type, stoneRecord.netWeight,stoneRecord.price, stoneRecord.recordUser, createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -905,6 +905,7 @@ DataManager.prototype.searchStoneRecords = function (query, callback) {
                         data["total"] = res.total;
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
                         };
                         data["sumContent"] = [sumContent];
                         return callback(error, data);
@@ -924,7 +925,7 @@ DataManager.prototype.getStoneRecordsCount = function (date, callback) {
         if(date){
             fromDate = getSearchFromDate(date);
             toDate = getSearchToDate(date);
-            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight FROM stonerecord WHERE createdDate BETWEEN ? AND ?";
+            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight, SUM(price) AS sumPrice FROM stonerecord WHERE createdDate BETWEEN ? AND ?";
             db.get(searchString, [fromDate, toDate], function (error, result) {
                 if (callback) {
                     callback(error, result);
@@ -991,6 +992,7 @@ DataManager.prototype.searchPersonStoneRecords = function (query, callback) {
                         data["total"] = res.total;
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
                         };
                         data["sumContent"] = [sumContent];
                         return callback(error, data);
@@ -1033,7 +1035,7 @@ DataManager.prototype.getPersonStoneRecordsCount = function (query, callback) {
 
     db.serialize(function () {
         var searchString;
-        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight FROM stonerecord " + searchStr;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight, SUM(price) AS sumPrice FROM stonerecord " + searchStr;
             db.get(searchString, searchData, function (error, result) {
                 if (callback) {
                     callback(error, result);
@@ -1056,7 +1058,7 @@ DataManager.prototype.searchFactoryStoneRecords = function (query, callback) {
     var toDate = getSearchToDate(query.toDate);
     var stoneType = query.type;
 
-    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight FROM stonerecord WHERE ";
+    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight,SUM(price) AS price FROM stonerecord WHERE ";
     var searchData = [];
     if(stoneType){
         searchStr += "type = ? AND ";
@@ -1077,6 +1079,7 @@ DataManager.prototype.searchFactoryStoneRecords = function (query, callback) {
                         data["total"] = res.total;
                         var sumContent = {
                             "sumNetWeight":res.sumNetWeight,
+                            "sumPrice":res.sumPrice,
                         };
                         data["sumContent"] = [sumContent];
                         return callback(error, data);
@@ -1106,7 +1109,7 @@ DataManager.prototype.getFactoryStoneRecordsCount = function (query, callback) {
 
     db.serialize(function () {
         var searchString;
-        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight FROM stonerecord " + searchStr;
+        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight,SUM(price) AS sumPrice FROM stonerecord " + searchStr;
             db.get(searchString, searchData, function (error, result) {
                 if (callback) {
                     callback(error, result);
