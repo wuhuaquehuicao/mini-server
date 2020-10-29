@@ -101,7 +101,7 @@ export default {
         createdDate: new Date(),
         plateNumber: "",
         netWeight: "",
-        price:""
+        price:""，
         recordUser:"远兰",
         type:"大石"
       },
