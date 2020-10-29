@@ -16,7 +16,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="车牌" prop="plateNumber">
-        <el-select v-model="form.plateNumber" size="small">
+        <el-select v-model="form.plateNumber" size="small" filterable>
           <el-option v-for="item in plateNOptions"
           :key="item.plateNumber"
           :label="item.plateNumber"
@@ -96,6 +96,7 @@ export default {
         createdDate: new Date(),
         plateNumber: "",
         netWeight: "",
+        price:"",
         recordUser:"阿青",
         type:"大石"
       },
