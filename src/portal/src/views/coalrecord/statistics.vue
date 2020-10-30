@@ -233,6 +233,7 @@ export default {
       coalTypeOptions:[
         {type:"福建"},
         {type:"山西"},
+        {type:"湖南"},
       ],
       personForm: {
         plateNumber: "",

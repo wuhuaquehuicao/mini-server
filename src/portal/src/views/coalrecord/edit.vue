@@ -98,6 +98,7 @@ export default {
       coalTypeOptions:[
         {type:"福建"},
         {type:"山西"},
+        {type:"湖南"},
       ],
       form: {
         id: 0,
@@ -261,11 +262,12 @@ export default {
               data: self.form
             })
               .then(response => {
+                var defaultDate = this.form.createdDate;
+                var time = defaultDate.getTime() + 60 * 1000 * 30;
+                var newDate = new Date(time);
                 this.form = {
                     id: 0,
-                    createdDate: new Date(),
-                    name:"",
-                    plateNumber:"",
+                    createdDate:newDate,
                 };
                 this.loading = false;
                 this.$message({
