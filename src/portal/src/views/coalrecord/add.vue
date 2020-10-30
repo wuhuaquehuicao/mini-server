@@ -226,9 +226,15 @@ export default {
                 var defaultDate = this.form.createdDate;
                 var time = defaultDate.getTime() + 60 * 1000 * 30;
                 var newDate = new Date(time);
+                var defaultName = this.form.name;
+                var defaulPlateN = this.form.plateNumber;
+                var defaultType = this.form.type;
                 this.form = {
                     id: 0,
                     createdDate:newDate,
+                    name:defaultName,
+                    plateNumber:defaulPlateN,
+                    type:defaultType
                 };
                 this.loading = false;
                 this.$message({
