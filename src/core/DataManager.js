@@ -1426,7 +1426,7 @@ DataManager.prototype.addDealUser = function (dealUser, callback) {
     var self = this;
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss"); 
     db.serialize(function () {
-        db.get("SELECT * FROM dealUser WHERE name= ?", [dealUser.name], function (error, result){
+        db.get("SELECT * FROM dealUser WHERE name= ? AND type = ?", [dealUser.name,dealUser.type],  function (error, result){
             if(result){
                 callback(null, {error:"已经存在该用户，请用其他名字。"})
             }
