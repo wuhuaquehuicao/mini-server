@@ -55,6 +55,7 @@ function DataManager() {
         db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS buycaorecord (id INTEGER primary key, name TEXT, plateNumber TEXT, source TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS otherrecord (id INTEGER primary key, name TEXT, note TEXT, type TEXT, price INT, count INT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS caoOilrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, count INT, price INT, cashpaid INT, wxpaid INT, unpaid INT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
 
@@ -484,6 +485,317 @@ DataManager.prototype.getFactoryRecordsCount = function (query, callback) {
     });
 };
 
+
+//Handl caoOil record
+DataManager.prototype.addCaoOilRecord = function (record, callback) {
+    var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
+    var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("INSERT INTO caoOilrecord (type, name, plateNumber,totalWeight,tareWeight,netWeight,count,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.count,record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            record["id"] = this.lastID;
+                            self.updateDealUserUpdateTime(record.name);
+                            return self.getCaoOilRecord(this.lastID, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.updateCaoOilRecord = function (id, record, callback) {
+    var self = this;
+    var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss")
+    var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
+    db.serialize(function () {
+        db.run("UPDATE caoOilrecord SET type = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?, count=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.count, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate,
+            modifiedDate, id], function (error, result) {
+                if (callback) {
+                    if (!error) {
+                        if (this.changes == 1) {
+                            return self.getCaoOilRecord(id, callback);
+                        }
+                    }
+                    callback(error, null);
+                }
+            });
+    });
+};
+
+DataManager.prototype.deleteCaoOilRecord = function (id, callback) {
+    var self = this;
+    db.serialize(function () {
+        db.get("DELETE FROM caoOilrecord WHERE id= ?", [id], function (error, result){
+            if (callback) {
+                if (!error) {
+                    return callback(null, {});
+                }
+                callback(error, null);
+            }
+        });   
+    });
+};
+
+DataManager.prototype.getCaoOilRecord = function (id, callback) {
+    db.serialize(function () {
+        db.get("SELECT * FROM caoOilrecord WHERE id= ?", [id], callback);
+    });
+};
+
+DataManager.prototype.searchCaoOilRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var selectedDate = query.date;
+    var fromDate = getSearchFromDate(selectedDate);
+    var toDate = getSearchToDate(selectedDate);
+    db.serialize(function () {
+        db.all("SELECT * FROM caoOilrecord WHERE createdDate BETWEEN ? AND ? order by type DESC, createdDate ASC limit ? offset ?", [fromDate, toDate, size, offset],  function (error, result) {
+            if (callback) {
+                self.getCaoOilRecordsCount(selectedDate, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumCount":res.sumCount,
+                            "sumPrice":res.sumPrice,
+                            "sumCashpaid":res.sumCashpaid,
+                            "sumWxpaid":res.sumWxpaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getCaoOilRecordsCount = function (date, callback) {
+    db.serialize(function () {
+        var searchString;
+        var fromDate;
+        var toDate;
+        if(date){
+            fromDate = getSearchFromDate(date);
+            toDate = getSearchToDate(date);
+            searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight , SUM(count) AS sumCount, SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM caoOilrecord WHERE createdDate BETWEEN ? AND ? order by modifiedDate DESC";
+            db.get(searchString, [fromDate, toDate], function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        else{
+            searchString = "SELECT count(*) as total FROM caoOilrecord";
+            db.get(searchString, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });
+        }
+        
+    });
+};
+
+//search personCaoOilRecord
+DataManager.prototype.searchPersonCaoOilRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+
+    var searchStr = "SELECT * FROM caoOilrecord WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+    
+    var caoOilType = query.type;
+    if(caoOilType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoOilType);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getPersonCaoOilRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumCount":res.sumCount,
+                            "sumPrice":res.sumPrice,
+                            "sumCashpaid":res.sumCashpaid,
+                            "sumWxpaid":res.sumWxpaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getPersonCaoOilRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+
+    var caoType = query.type;
+    if(caoType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoType);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(*) as total, SUM(netWeight) AS sumNetWeight ,SUM(count) AS sumCount, SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM caoOilrecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
+
+//Search factoryRecord
+DataManager.prototype.searchFactoryCaoOilRecords = function (query, callback) {
+    var self = this;
+    var size = 100;
+    var page = 0;
+    if ("size" in query)
+        size = parseInt(query.size);
+    if ("page" in query)
+        page = parseInt(query.page);
+    var offset = page * size;
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    
+    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(count) AS sumCount,SUM(cashpaid) AS cashpaid ,SUM(wxpaid) AS wxpaid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM caoOilrecord WHERE ";
+    var searchData = [];
+
+    var caoType = query.type;
+    if(caoType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoType);
+    }
+
+    searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate ASC limit ? offset ?";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+    searchData.push(size);
+    searchData.push(offset);
+    db.serialize(function () {
+        db.all(searchStr, searchData,  function (error, result) {
+            if (callback) {
+                self.getFactoryCaoOilRecordsCount(query, (err, res) => {
+                    if (!error) {
+                        var data = {};
+                        data["content"] = result;
+                        data["total"] = res.total;
+                        var sumContent = {
+                            "sumNetWeight":res.sumNetWeight,
+                            "sumCount":res.sumCount,
+                            "sumPrice":res.sumPrice,
+                            "sumCashpaid":res.sumCashpaid,
+                            "sumWxpaid":res.sumWxpaid,
+                            "sumUnpaid":res.sumUnpaid
+                        };
+                        data["sumContent"] = [sumContent];
+                        return callback(error, data);
+                    }
+                    callback(error, result);
+                });
+            }
+        });
+    });
+};
+
+DataManager.prototype.getFactoryCaoOilRecordsCount = function (query, callback) {
+    var fromDate = getSearchFromDate(query.fromDate);
+    var toDate = getSearchToDate(query.toDate);
+    
+    var searchStr = "WHERE ";
+    var searchData = [];
+
+    var caoType = query.type;
+    if(caoType){
+        searchStr += "type = ? AND ";
+        searchData.push(caoType);
+    }
+    
+    searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
+    searchData.push(fromDate);
+    searchData.push(toDate);
+
+    db.serialize(function () {
+        var searchString;
+        searchString = "SELECT count(DISTINCT name) as total, SUM(netWeight) AS sumNetWeight ,SUM(count) AS sumCount,SUM(cashpaid) AS sumCashpaid ,SUM(wxpaid) AS sumWxpaid ,SUM(unpaid) AS sumUnpaid , SUM(price) AS sumPrice FROM caoOilrecord " + searchStr;
+            db.get(searchString, searchData, function (error, result) {
+                if (callback) {
+                    callback(error, result);
+                }
+            });    
+    });
+};
 
 //Handle buycao record
 DataManager.prototype.addBuyCaoRecord = function (record, callback) {

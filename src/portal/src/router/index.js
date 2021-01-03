@@ -104,6 +104,42 @@ export const constantRouterMap = [
     ]
   },
 
+  // 灰油销售记录
+  {
+    path: '/caoOilrecord',
+    component: Layout,
+    redirect: '/caoOilrecord/list',
+    name: 'CaoOilRecord',
+    meta: { title: '灰油销售记录', icon: 'example' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/caoOilrecord/list'),
+        meta: { title: '查看', icon: 'table' }
+      },
+      {
+        path: 'add',
+        name: 'Add',
+        component: () => import('@/views/caoOilrecord/add'),
+        meta: { title: '新增', icon: 'table' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'EditCaoOilRecord',
+        component: () => import('@/views/caoOilrecord/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
+      },
+      {
+        path: 'statistics',
+        name: 'StatisticsCaoOilRecord',
+        component: () => import('@/views/caoOilrecord/statistics'),
+        meta: { title: '统计', icon: 'table' }
+      }
+    ]
+  },
+
   // 石灰外调记录
   {
     path: '/buycaorecord',
