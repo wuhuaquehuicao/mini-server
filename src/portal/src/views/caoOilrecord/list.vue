@@ -38,6 +38,7 @@
       <el-table-column prop="cashpaid" label="现金支付" width="100"/>
       <el-table-column prop="wxpaid" label="微信支付" width="100"/>
       <el-table-column prop="unpaid" label="未支付" width="100"/>
+      <el-table-column prop="note" label="备注" width="150"/>     
       <el-table-column prop="createdDate" label="购买时间">
         <template slot-scope="scope">
             <span>{{ new Date(scope.row.createdDate) | formatDate('hh:mm:ss') }}</span>

@@ -85,6 +85,7 @@
             <el-table-column prop="cashpaid" label="现金支付" width="80"/>
             <el-table-column prop="wxpaid" label="微信支付" width="80"/>
             <el-table-column prop="unpaid" label="未支付" width="80"/>
+            <el-table-column prop="note" label="备注" width="150"/>
             <el-table-column prop="createdDate" label="购买时间">
             </el-table-column>
             <el-table-column prop="modifiedDate" label="修改时间"/>
