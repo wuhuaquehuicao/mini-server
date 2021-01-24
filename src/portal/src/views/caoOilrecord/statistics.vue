@@ -43,7 +43,18 @@
                 </el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item label="" prop="type" >
+                <el-select v-model="personForm.payee" size="small" placeholder="收款人" clearable="true">
+                <el-option v-for="item in payeeOptions"
+                :key="item.payee"
+                :label="item.payee"
+                :value="item.payee"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
             
+
             <el-form-item>
                 <el-button type="primary" @click="personSearch()">查询</el-button>
             </el-form-item>
@@ -65,18 +76,18 @@
             <el-table-column prop="name" label="姓名" width="150"/>
             <el-table-column prop="plateNumber" label="车牌号" width="80"/>
             <el-table-column prop="type" label="灰油类型" width="120"/>
-            <el-table-column prop="count" label="包数" width="150"/>
+            <el-table-column prop="count" label="包数" width="80"/>
             <el-table-column prop="netWeight" label="净重" width="80"/>
             <el-table-column prop="totalWeight" label="总重" width="80"/>
             <el-table-column prop="tareWeight" label="皮重" width="80"/>
             <el-table-column prop="price" label="总价" width="80"/>
+            <el-table-column prop="payee" label="收款人" width="80"/>
             <el-table-column prop="cashpaid" label="现金支付" width="80"/>
             <el-table-column prop="wxpaid" label="微信支付" width="80"/>
             <el-table-column prop="unpaid" label="未支付" width="80"/>
             <el-table-column prop="createdDate" label="购买时间">
             </el-table-column>
             <el-table-column prop="modifiedDate" label="修改时间"/>
-            <el-table-column prop="kilnName" label="窑名" width="60"/>
             <el-table-column label="操作" width="80">
                 <template slot-scope="scope">
                 <!-- <el-button @click="$router.push({ name: 'Detail', params: {id: scope.row.id} })">详情</el-button> -->
@@ -131,17 +142,6 @@
                 <el-date-picker v-model="factoryForm.searchDate" type="daterange" placeholder="选择日期" unlink-panels>
                 </el-date-picker>
             </el-form-item>
-
-            <el-form-item label="" prop="kilnName" >
-                <el-select v-model="factoryForm.kilnName" size="small" clearable placeholder="选择窑名">
-                <el-option v-for="item in kilnsOptions"
-                :key="item.id"
-                :label="item.kilnName"
-                :value="item.kilnName"
-                >
-                </el-option>
-                </el-select>
-            </el-form-item>
             
             <el-form-item label="" prop="type" >
                 <el-select v-model="personForm.type" size="small" placeholder="选择灰油类型" clearable="true">
@@ -173,12 +173,12 @@
                  </template>
             </el-table-column>
             <el-table-column prop="name" label="姓名" width="150"/>
-            <el-table-column prop="netWeight" label="净重" width="150">
+            <el-table-column prop="netWeight" label="净重" width="120">
             <template slot-scope="scope">
                 <span>{{scope.row.netWeight | rounding}}</span>
                 </template>    
             </el-table-column>
-            <el-table-column prop="count" label="包数" width="150">
+            <el-table-column prop="count" label="包数" width="120">
             <template slot-scope="scope">
                 <span>{{scope.row.count | rounding}}</span>
                 </template>    
@@ -264,9 +264,9 @@ export default {
         {type:"砌墙粗底灰油"},
         {type:"墙面灰油"},
       ],
-      kilnsOptions:[
-        {id:1, kilnName:"新窑"},
-        {id:2, kilnName:"老窑"},
+      payeeOptions:[
+        {payee:"黄道纯"},
+        {payee:"黄瑜青"},
       ],
       personForm: {
         plateNumber: "",
@@ -354,20 +354,6 @@ export default {
                 console.log(error);
               });
     },
-    getKilns(){
-      request({
-        url: "/kilns",
-        method: "get"
-      })
-        .then(response => {
-          this.kilnsOptions = response;
-          this.loading = false;
-        })
-        .catch(error => {
-          this.loading = false;
-          console.log(error);
-        });
-    },
     edit(id) {
       this.$router.push({ name: "EditCaoOilRecord", params: { id: id } });
     },
@@ -384,6 +370,8 @@ export default {
       var userName = this.personForm.userName;
       var plateNumber = this.personForm.plateNumber;
       var type = this.personForm.type;
+      var payee = this.personForm.payee;
+
       if(userName){
           params["userName"] = userName;
       }
@@ -392,6 +380,9 @@ export default {
       }
       if(type){
           params["type"] = type;
+      }
+      if(payee){
+          params["payee"] = payee;
       }
 
       request({

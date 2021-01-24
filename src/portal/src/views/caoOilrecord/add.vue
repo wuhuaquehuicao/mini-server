@@ -60,6 +60,16 @@
       <el-form-item label="总价" prop="price">
         <el-input v-model="form.price" auto-complete="off" placeholder="总价"/>
       </el-form-item>
+      <el-form-item label="收款人" prop="payee">
+        <el-select v-model="form.payee" size="small" clearable>
+          <el-option v-for="item in payeeOptions"
+          :key="item.payee"
+          :label="item.payee"
+          :value="item.payee"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="现金付款" prop="cashpaid">
         <el-input v-model="form.cashpaid" auto-complete="off" placeholder="现金付款"/>
       </el-form-item>
@@ -97,6 +107,10 @@ export default {
         {type:"纸巾灰油"},
         {type:"砌墙粗底灰油"},
         {type:"墙面灰油"},
+      ],
+      payeeOptions:[
+        {payee:"黄道纯"},
+        {payee:"黄瑜青"},
       ],
       form: {
         id: 0,

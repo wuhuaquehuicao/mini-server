@@ -55,7 +55,7 @@ function DataManager() {
         db.run("CREATE TABLE IF NOT EXISTS record (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT,kilnName TEXT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS buycaorecord (id INTEGER primary key, name TEXT, plateNumber TEXT, source TEXT, totalWeight INT, tareWeight INT, netWeight INT, ashWeight INT, price INT, cashpaid INT, wxpaid INT, unpaid INT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
         db.run("CREATE TABLE IF NOT EXISTS otherrecord (id INTEGER primary key, name TEXT, note TEXT, type TEXT, price INT, count INT, createdDate DATETIME, modifiedDate DATETIME)");
-        db.run("CREATE TABLE IF NOT EXISTS caoOilrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, count INT, price INT, cashpaid INT, wxpaid INT, unpaid INT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
+        db.run("CREATE TABLE IF NOT EXISTS caoOilrecord (id INTEGER primary key, name TEXT, plateNumber TEXT, totalWeight INT, tareWeight INT, netWeight INT, count INT, price INT, payee INT, cashpaid INT, wxpaid INT, unpaid INT, type TEXT, createdDate DATETIME, modifiedDate DATETIME)");
     });
 }
 
@@ -492,8 +492,8 @@ DataManager.prototype.addCaoOilRecord = function (record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss");
     var modifiedDate =  new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("INSERT INTO caoOilrecord (type, name, plateNumber,totalWeight,tareWeight,netWeight,count,price,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.count,record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
+        db.run("INSERT INTO caoOilrecord (type, name, plateNumber,totalWeight,tareWeight,netWeight,count,price,payee,cashpaid, wxpaid,unpaid,createdDate,modifiedDate) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.count,record.price, record.payee, record.cashpaid,record.wxpaid, record.unpaid, createdDate, modifiedDate, function (error, result) {
                 if (callback) {
                     if (!error) {
                         if (this.changes == 1) {
@@ -513,8 +513,8 @@ DataManager.prototype.updateCaoOilRecord = function (id, record, callback) {
     var createdDate = new Date(record.createdDate).format("yyyy-MM-dd hh:mm:ss")
     var modifiedDate = new Date().format("yyyy-MM-dd hh:mm:ss");
     db.serialize(function () {
-        db.run("UPDATE caoOilrecord SET type = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?, count=?,price=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
-            [record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.count, record.price, record.cashpaid,record.wxpaid, record.unpaid, createdDate,
+        db.run("UPDATE caoOilrecord SET type = ?, name = ?, plateNumber = ?, totalWeight = ?, tareWeight= ?,netWeight=?, count=?,price=?,payee=?,cashpaid=?,wxpaid=?,unpaid=?, createdDate=?,modifiedDate=?  WHERE id = ?",
+            [record.type, record.name, record.plateNumber, record.totalWeight, record.tareWeight, record.netWeight, record.count, record.price, record.payee,record.cashpaid,record.wxpaid, record.unpaid, createdDate,
             modifiedDate, id], function (error, result) {
                 if (callback) {
                     if (!error) {
@@ -646,6 +646,12 @@ DataManager.prototype.searchPersonCaoOilRecords = function (query, callback) {
         searchData.push(caoOilType);
     }
 
+    var payee = query.payee;
+    if(payee){
+        searchStr += "payee = ? AND ";
+        searchData.push(payee);
+    }
+    
     searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC limit ? offset ?";
     searchData.push(fromDate);
     searchData.push(toDate);
@@ -701,6 +707,12 @@ DataManager.prototype.getPersonCaoOilRecordsCount = function (query, callback) {
         searchData.push(caoType);
     }
 
+    var payee = query.payee;
+    if(payee){
+        searchStr += "payee = ? AND ";
+        searchData.push(payee);
+    }
+
     searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";
     searchData.push(fromDate);
     searchData.push(toDate);
@@ -729,7 +741,7 @@ DataManager.prototype.searchFactoryCaoOilRecords = function (query, callback) {
     var fromDate = getSearchFromDate(query.fromDate);
     var toDate = getSearchToDate(query.toDate);
     
-    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(count) AS sumCount,SUM(cashpaid) AS cashpaid ,SUM(wxpaid) AS wxpaid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM caoOilrecord WHERE ";
+    var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(count) AS count,SUM(cashpaid) AS cashpaid ,SUM(wxpaid) AS wxpaid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM caoOilrecord WHERE ";
     var searchData = [];
 
     var caoType = query.type;

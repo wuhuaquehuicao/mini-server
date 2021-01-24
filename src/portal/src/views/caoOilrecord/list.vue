@@ -34,6 +34,7 @@
       <el-table-column prop="totalWeight" label="总重" width="80"/>
       <el-table-column prop="tareWeight" label="皮重" width="80"/>
       <el-table-column prop="price" label="总价" width="100"/>
+      <el-table-column prop="payee" label="收款人" width="100"/>
       <el-table-column prop="cashpaid" label="现金支付" width="100"/>
       <el-table-column prop="wxpaid" label="微信支付" width="100"/>
       <el-table-column prop="unpaid" label="未支付" width="100"/>
