@@ -79,6 +79,9 @@
       <el-form-item label="未付款" prop="unpaid">
         <el-input v-model="form.unpaid" auto-complete="off" placeholder="未付款"/>
       </el-form-item>
+      <el-form-item label="备注" prop="note">
+        <el-input v-model="form.note" auto-complete="off" placeholder="备注"/>
+      </el-form-item>
     </el-form>
 
     <div>
