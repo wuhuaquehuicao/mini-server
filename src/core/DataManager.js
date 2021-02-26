@@ -744,10 +744,29 @@ DataManager.prototype.searchFactoryCaoOilRecords = function (query, callback) {
     var searchStr = "SELECT name AS name, SUM(netWeight) AS netWeight ,SUM(count) AS count,SUM(cashpaid) AS cashpaid ,SUM(wxpaid) AS wxpaid ,SUM(unpaid) AS unpaid , SUM(price) AS price FROM caoOilrecord WHERE ";
     var searchData = [];
 
-    var caoType = query.type;
-    if(caoType){
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+    
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+    
+    var caoOilType = query.type;
+    if(caoOilType){
         searchStr += "type = ? AND ";
-        searchData.push(caoType);
+        searchData.push(caoOilType);
+    }
+
+    var payee = query.payee;
+    if(payee){
+        searchStr += "payee = ? AND ";
+        searchData.push(payee);
     }
 
     searchStr +="createdDate BETWEEN ? AND ? GROUP BY name order by createdDate ASC limit ? offset ?";
@@ -788,10 +807,29 @@ DataManager.prototype.getFactoryCaoOilRecordsCount = function (query, callback) 
     var searchStr = "WHERE ";
     var searchData = [];
 
+    var userName = query.userName;
+    var plateNumber = query.plateNumber;
+
+    if(userName){
+        searchStr += "name = ? AND ";
+        searchData.push(userName);
+    }
+
+    if(plateNumber){
+        searchStr += "plateNumber = ? AND ";
+        searchData.push(plateNumber);
+    }
+
     var caoType = query.type;
     if(caoType){
         searchStr += "type = ? AND ";
         searchData.push(caoType);
+    }
+
+    var payee = query.payee;
+    if(payee){
+        searchStr += "payee = ? AND ";
+        searchData.push(payee);
     }
     
     searchStr +="createdDate BETWEEN ? AND ? order by createdDate ASC";

@@ -43,7 +43,7 @@
                 </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="" prop="type" >
+            <el-form-item label="" prop="payee" >
                 <el-select v-model="personForm.payee" size="small" placeholder="收款人" clearable="true">
                 <el-option v-for="item in payeeOptions"
                 :key="item.payee"
@@ -144,12 +144,44 @@
                 </el-date-picker>
             </el-form-item>
             
+             <el-form-item label="" prop="userName" >
+                <el-select v-model="factoryForm.userName" size="small" placeholder="选择姓名" clearable @change="selectedUser" filterable>
+                <el-option v-for="item in usersOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.name"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="" prop="plateNumber" >
+                <el-select v-model="factoryForm.plateNumber" size="small" placeholder="选择车牌" clearable="true">
+                <el-option v-for="item in plateNOptions"
+                :key="item.plateNumber"
+                :label="item.plateNumber"
+                :value="item.plateNumber"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
+
             <el-form-item label="" prop="type" >
-                <el-select v-model="personForm.type" size="small" placeholder="选择灰油类型" clearable="true">
+                <el-select v-model="factoryForm.type" size="small" placeholder="选择灰油类型" clearable="true">
                 <el-option v-for="item in typeOptions"
                 :key="item.type"
                 :label="item.type"
                 :value="item.type"
+                >
+                </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="" prop="payee" >
+                <el-select v-model="factoryForm.payee" size="small" placeholder="收款人" clearable="true">
+                <el-option v-for="item in payeeOptions"
+                :key="item.payee"
+                :label="item.payee"
+                :value="item.payee"
                 >
                 </el-option>
                 </el-select>
@@ -274,7 +306,8 @@ export default {
         userName : ""
       },
       factoryForm: {
-          kilnName:""
+          plateNumber: "",
+          userName : ""
       },
       rules: {
           searchDate: [{ required: true, message: "请选择时间", trigger: "blur" }],
@@ -412,13 +445,22 @@ export default {
           toDate:toDate
       };
       
-      var kilnName = this.factoryForm.kilnName;
-      var type = this.personForm.type;
-      if(kilnName){
-          params["kilnName"] = kilnName;
+      var userName = this.factoryForm.userName;
+      var plateNumber = this.factoryForm.plateNumber;
+      var type = this.factoryForm.type;
+      var payee = this.factoryForm.payee;
+
+      if(userName){
+          params["userName"] = userName;
+      }
+      if(plateNumber){
+          params["plateNumber"] = plateNumber;
       }
       if(type){
           params["type"] = type;
+      }
+      if(payee){
+          params["payee"] = payee;
       }
 
       request({
